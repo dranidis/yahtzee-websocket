@@ -37,7 +37,7 @@ public class GameController {
 	}
 
 	@RequestMapping("/start")
-	public Sheet start() {
+	public GameString start() {
 		if (game == null) {
 			return null;
 		}
@@ -45,7 +45,8 @@ public class GameController {
 		System.out.println("Round starts");
 		game.startRound();
 	
-		return new Sheet(game.getScored());
+		// return new Sheet(game.getScored());
+		return new GameString(game.toString());
 	}
 
 	// public String greeting(@RequestParam(name="name", required=false, defaultValue="World") String name, Model model) {
