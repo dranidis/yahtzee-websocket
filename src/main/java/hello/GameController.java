@@ -1,5 +1,7 @@
 package hello;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicLong;
 
 import com.asdt.yahtzee.game.Game;
@@ -35,27 +37,33 @@ public class GameController {
 	}
 
 	@RequestMapping("/start")
-	public GameString start() {
-		System.out.println("New game created");
+	public Sheet start() {
+		if (game == null) {
+			return null;
+		}
+		System.out.println("New game started with " + game.getPlayers());
 		System.out.println("Round starts");
 		game.startRound();
-		String playerName = game.getCurrentPlayersName();
-		System.out.println("1st player rolls");
-		game.rollKeeping(playerName);
-		System.out.println("Round starts");
-		return new GameString(game.toString());
+	
+		return new Sheet(game.getScored());
 	}
+
+	// public String greeting(@RequestParam(name="name", required=false, defaultValue="World") String name, Model model) {
 
 	@RequestMapping("/keep")
 	public GameString keep(@RequestParam(value="name") String name, @RequestParam(value="keep") int[] keep) {
+		System.out.println(name + " rolls keeping " + new ArrayList<>(Arrays.asList(keep)));
 		game.rollKeeping(name, keep);
 		return new GameString(game.toString());
 	}
 
 	@RequestMapping("/score")
-	public GameString score(@RequestParam(value="name") String playerName, @RequestParam(value="cat") String categoryName) {
-		game.scoreACategory(playerName, categoryName);
-		return new GameString(game.toString());
+	public Score score(@RequestParam(value="name") String playerName, @RequestParam(value="cat") String categoryName) {
+		int score = game.scoreACategory(playerName, categoryName);
+		System.out.println(playerName + " scores " + categoryName);
+		System.out.println(playerName + " gets " + score + " points");
+		game.startRound();
+		return new Score(score);
 	}
 
 
