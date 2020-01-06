@@ -15,6 +15,7 @@
             $("#gameControl").hide();
 
             var playerName;
+            var disabled;
 
             function setConnected(connected) {
                 if (connected) {
@@ -49,14 +50,28 @@
                 $("#players").append("<div>" + name + "</div>");
             }
 
+            /*
+            Handle for all players the game broadcast
+            */
             function handleGame(game) {
                 $("#startBtn").prop("disabled", true);
+                $("#gameControl").show();
+
                 if (game.currentPlayer == playerName) {
-                    $("#gameControl").show();
+                    disableControl(false);
+                    $('#currentPlayer').html("You");
+                    $('#keepBtn').prop("disabled", game.roll >= 3);
+
+                    if (game.categoryName != "") {
+                        $('#' + game.categoryName).html(game.score);
+                    }
                 } else {
-                    $("#gameControl").hide();
+                    disableControl(true);
+                    $('#currentPlayer').html(game.currentPlayer);
 
                 }
+
+
                 $('#dice').html(
                     game.dice[0] + " " +
                     game.dice[1] + " " +
@@ -64,6 +79,9 @@
                     game.dice[3] + " " +
                     game.dice[4] + " "
                 );
+
+                $('#categoryScored').html(game.categoryName);
+                $('#score').html(game.score);
             }
 
             $("#addPlayerBtn").click(function () {
@@ -98,34 +116,23 @@
 
             });
 
-
-            // var scoreCat = "";
-            // $("#scoreBtn").click(function() {
-            //     scoreCat = $("#catName").val();
-            //     $.ajax({
-            //         url: "score?name=" + playerName + "&cat=" + scoreCat,
-            //         success: function(result) {
-            //             $("#div1").html(JSON.stringify(result));
-            //         }
-            //     });
-            // });
-
             $(".catscore").click(function () {
-                console.log(this.id);
-                var tid = this.id
-                $.ajax({
-                    url: "score?name=" + playerName + "&cat=" + this.id,
-                    dataType: "json",
-                    success: function (result) {
-                        // var data = JSON.parse(result);
-                        var score = result.score;
-                        console.log("#" + tid);
-                        $("#" + tid).html(score);
-                    }
-                });
+                if (disabled) return; // not your turn!
+
+                var tid = this.id;
+
+                if ($('#' + tid).html() != '_____') {
+                    return;
+                }
+                stompClient.send("/app/score", {}, JSON.stringify({ 'name': playerName, 'category': this.id }));
             });
 
-
+            function disableControl(boolean) {
+                console.log("Disable controls :" + boolean)
+                $('#keepBtn').prop("disabled", boolean);
+                $('.keep').prop("disabled", boolean);
+                disabled = boolean;
+            }
 
         });
     </script>
@@ -136,7 +143,6 @@
     <div>PLAYERS
         <div id="players"></div>
     </div>
-    <p th:text="'H</div>e</div>llo, ' + ${name} + '!'">Yahtzee game! </p>
 
     <!-- <p>
         <button id="gameBtn">New Game</button>
@@ -148,28 +154,28 @@
     <p>
         <button id="startBtn">Start</button>
     </p>
+    <div>Current player
+        <div id="currentPlayer"></div>
+    </div>
     <div>Dice rolled:
         <div id="dice"></div>
+    </div>
+    <div>Category score
+        <div id="categoryScored"></div>
+        <div id="score"></div>
     </div>
     <div id="gameControl">
         <div id="dice"></div>
         <p>
             Choose dice to keep:
-            <input type="checkbox" id="keep1">
-            <input type="checkbox" id="keep2">
-            <input type="checkbox" id="keep3">
-            <input type="checkbox" id="keep4">
-            <input type="checkbox" id="keep5">
+            <input type="checkbox" class="keep" id="keep1">
+            <input type="checkbox" class="keep" id="keep2">
+            <input type="checkbox" class="keep" id="keep3">
+            <input type="checkbox" class="keep" id="keep4">
+            <input type="checkbox" class="keep" id="keep5">
             <button id="keepBtn">Roll</button>
 
         </p>
-
-        <p>
-            Category to score:
-            <input id="catName" type="text" value="" />
-            <button id="scoreBtn">Score</button>
-        </p>
-
 
         <table>
             <tr>

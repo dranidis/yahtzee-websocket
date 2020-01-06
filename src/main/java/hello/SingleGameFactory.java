@@ -17,16 +17,27 @@ public class SingleGameFactory {
 
 	public GameMessage start() {
         game.startRound();
+        System.out.println("Game started with " + game.getPlayers().keySet());
         String currentPlayer = game.getNextPlayer();
         game.rollKeeping(currentPlayer);
         int[] dice = game.getDice();
-        return new GameMessage(currentPlayer, dice);
+        return new GameMessage(currentPlayer, dice, 1, "");
 	}
 
 	public GameMessage rollKeeping(String currentPlayer, int[] keep) {
-        game.rollKeeping(currentPlayer, keep);
-        int[] dice = game.getDice();
-        return new GameMessage(currentPlayer, dice);
-	}
+        int roll = game.getCurrentPlayer().getRoll();
+        if (roll <= 3) {
+            game.rollKeeping(currentPlayer, keep);
+            int[] dice = game.getDice();
+            return new GameMessage(currentPlayer, dice, roll, "");
+        }
+        // TODO: throw exception?
+        return null;
+    }
+    
+    public GameMessage scoreCategory(String playerName, String categoryName) {
+        int score = game.scoreACategory(playerName, categoryName);
+        return new GameMessage(playerName, game.getDice(), game.getCurrentPlayer().getRoll(), categoryName, score);
+    }
 
 }

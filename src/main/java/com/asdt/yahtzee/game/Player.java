@@ -205,4 +205,9 @@ public class Player {
         return dice[i].getNumber();
     }
 
+    public int getRoll() {
+        return roll;
+    }
+
+
 }

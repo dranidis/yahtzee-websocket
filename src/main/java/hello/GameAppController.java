@@ -47,4 +47,12 @@ public class GameAppController {
         return gameMsg;
     }
 
+    @MessageMapping("/score")
+    @SendTo("/topic/game")
+    public GameMessage roll(ScoreMessage scoreMsg) {
+        System.out.println("scoreMsg: " + scoreMsg);
+        GameMessage gameMsg = singleGameFactory.scoreCategory(scoreMsg.getName(), scoreMsg.getCategory());
+        return gameMsg;
+    }
+
 }

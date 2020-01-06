@@ -107,4 +107,9 @@ public class Game {
     public Map<String, Player> getPlayers() {
         return players;
     }
+
+    public Player getCurrentPlayer() {
+        return currentPlayer;
+    }
+
 }
