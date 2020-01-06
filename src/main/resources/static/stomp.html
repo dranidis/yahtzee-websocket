@@ -33,11 +33,11 @@
                 stompClient.connect({}, function (frame) {
                     console.log('Connected: ' + frame);
                     stompClient.subscribe('/topic/players', function (player) {
-                        console.log("received from /topic/players:" + player.body)
+                        // console.log("received from /topic/players:" + player.body)
                         showPlayer(JSON.parse(player.body).name);
                     });
                     stompClient.subscribe('/topic/game', function (game) {
-                        console.log("received from /topic/game:" + game.body)
+                        // console.log("received from /topic/game:" + game.body)
                         handleGame(JSON.parse(game.body));
                     });
                     setConnected(true);
@@ -68,9 +68,9 @@
                 } else {
                     disableControl(true);
                     $('#currentPlayer').html(game.currentPlayer);
-
+                    $('#categoryScored').html(game.categoryName);
+                    $('#score').html(game.score);
                 }
-
 
                 $('#dice').html(
                     game.dice[0] + " " +
@@ -80,8 +80,6 @@
                     game.dice[4] + " "
                 );
 
-                $('#categoryScored').html(game.categoryName);
-                $('#score').html(game.score);
             }
 
             $("#addPlayerBtn").click(function () {
@@ -125,6 +123,8 @@
                     return;
                 }
                 stompClient.send("/app/score", {}, JSON.stringify({ 'name': playerName, 'category': this.id }));
+
+                clearKeep();
             });
 
             function disableControl(boolean) {
@@ -132,6 +132,10 @@
                 $('#keepBtn').prop("disabled", boolean);
                 $('.keep').prop("disabled", boolean);
                 disabled = boolean;
+            }
+
+            function clearKeep() {
+                $('.keep').prop('checked', false);
             }
 
         });
@@ -176,63 +180,64 @@
             <button id="keepBtn">Roll</button>
 
         </p>
-
-        <table>
-            <tr>
-                <td class="catlabel"> 1's</td>
-                <td class="catscore" id="1s">_____</td>
-                <td class="catlabel"> 3 of a kind</td>
-                <td class="catscore" id="3k">_____</td>
-            </tr>
-            <tr>
-                <td class="catlabel"> 2's</td>
-                <td class="catscore" id="2s">_____</td>
-                <td class="catlabel"> 4 of a kind</td>
-                <td class="catscore" id="4k">_____</td>
-            </tr>
-            <tr>
-                <td class="catlabel"> 3's</td>
-                <td class="catscore" id="3s">_____</td>
-                <td class="catlabel"> full house</td>
-                <td class="catscore" id="fh">_____</td>
-            </tr>
-            <tr>
-                <td class="catlabel"> 4's</td>
-                <td class="catscore" id="4s">_____</td>
-                <td class="catlabel"> Sm. Straight</td>
-                <td class="catscore" id="s4">_____</td>
-            </tr>
-            <tr>
-                <td class="catlabel"> 5's</td>
-                <td class="catscore" id="5s">_____</td>
-                <td class="catlabel"> Lg. Straight</td>
-                <td class="catscore" id="s5">_____</td>
-            </tr>
-            <tr>
-                <td class="catlabel"> 6's</td>
-                <td class="catscore" id="6s">_____</td>
-                <td class="catlabel"> Yahtzee</td>
-                <td class="catscore" id="5k">_____</td>
-            </tr>
-            <tr>
-                <td class="catlabel"> Bonus</td>
-                <td id="UB">_____</td>
-                <td class="catlabel"> Chance</td>
-                <td class="catscore" id="ch">_____</td>
-            </tr>
-            <tr>
-                <td class="catlabel"> Section Total</td>
-                <td id="ST">_____</td>
-                <td class="catlabel"> Yahtzee Bonus</td>
-                <td id="YB">_____</td>
-            </tr>
-            <tr>
-                <td></td>
-                <td></td>
-                <td class="catlabel"> Total</td>
-                <td id="TOT">_____</td>
-            </tr>
-        </table>
+        <div>Your scoresheet
+            <table>
+                <tr>
+                    <td class="catlabel"> 1's</td>
+                    <td class="catscore" id="1s">_____</td>
+                    <td class="catlabel"> 3 of a kind</td>
+                    <td class="catscore" id="3k">_____</td>
+                </tr>
+                <tr>
+                    <td class="catlabel"> 2's</td>
+                    <td class="catscore" id="2s">_____</td>
+                    <td class="catlabel"> 4 of a kind</td>
+                    <td class="catscore" id="4k">_____</td>
+                </tr>
+                <tr>
+                    <td class="catlabel"> 3's</td>
+                    <td class="catscore" id="3s">_____</td>
+                    <td class="catlabel"> full house</td>
+                    <td class="catscore" id="fh">_____</td>
+                </tr>
+                <tr>
+                    <td class="catlabel"> 4's</td>
+                    <td class="catscore" id="4s">_____</td>
+                    <td class="catlabel"> Sm. Straight</td>
+                    <td class="catscore" id="s4">_____</td>
+                </tr>
+                <tr>
+                    <td class="catlabel"> 5's</td>
+                    <td class="catscore" id="5s">_____</td>
+                    <td class="catlabel"> Lg. Straight</td>
+                    <td class="catscore" id="s5">_____</td>
+                </tr>
+                <tr>
+                    <td class="catlabel"> 6's</td>
+                    <td class="catscore" id="6s">_____</td>
+                    <td class="catlabel"> Yahtzee</td>
+                    <td class="catscore" id="5k">_____</td>
+                </tr>
+                <tr>
+                    <td class="catlabel"> Bonus</td>
+                    <td id="UB">_____</td>
+                    <td class="catlabel"> Chance</td>
+                    <td class="catscore" id="ch">_____</td>
+                </tr>
+                <tr>
+                    <td class="catlabel"> Section Total</td>
+                    <td id="ST">_____</td>
+                    <td class="catlabel"> Yahtzee Bonus</td>
+                    <td id="YB">_____</td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td></td>
+                    <td class="catlabel"> Total</td>
+                    <td id="TOT">_____</td>
+                </tr>
+            </table>
+        </div>
     </div>
 
     <div id="div1">
