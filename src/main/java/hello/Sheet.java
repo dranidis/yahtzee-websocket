@@ -4,9 +4,12 @@ import java.util.Map;
 
 public class Sheet {
 
-	private final Map<String, Integer>  content;
+	private Map<String, Integer> content = null;
 
-	public Sheet(Map<String, Integer>  content) {
+	public Sheet() {
+	}
+
+	public Sheet(Map<String, Integer> content) {
 		this.content = content;
 	}
 

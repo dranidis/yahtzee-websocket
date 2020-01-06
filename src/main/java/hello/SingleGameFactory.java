@@ -24,7 +24,8 @@ public class SingleGameFactory {
         String currentPlayer = game.getNextPlayer();
         game.rollKeeping(currentPlayer);
         int[] dice = game.getDice();
-        return new GameMessage(currentPlayer, dice, 1, "");
+        Sheet sheet = new Sheet(game.getCurrentPlayer().getScored());
+        return new GameMessage(currentPlayer, sheet, dice, 1, "");
     }
 
     public GameMessage rollKeeping(String currentPlayer, int[] keep) {
@@ -32,7 +33,8 @@ public class SingleGameFactory {
         if (roll <= 3) {
             game.rollKeeping(currentPlayer, keep);
             int[] dice = game.getDice();
-            return new GameMessage(currentPlayer, dice, roll, "");
+            Sheet sheet = new Sheet(game.getCurrentPlayer().getScored());
+            return new GameMessage(currentPlayer, sheet, dice, roll, "");
         }
         // TODO: throw exception?
         return null;
@@ -43,10 +45,11 @@ public class SingleGameFactory {
 
     public GameMessage scoreCategory(String playerName, String categoryName) {
         int score = game.scoreACategory(playerName, categoryName);
+        Sheet sheet = new Sheet(game.getCurrentPlayer().getScored());
 
         System.out.println("Sending game to topic/game with messageSender:" + messageSender);
         messageSender.convertAndSend("/topic/game",
-                new GameMessage(playerName, game.getDice(), game.getCurrentPlayer().getRoll(), categoryName, score));
+                new GameMessage(playerName, sheet, game.getDice(), game.getCurrentPlayer().getRoll(), categoryName, score));
 
         String currentPlayer = game.getNextPlayer();
         if (currentPlayer == null ) {
@@ -56,7 +59,8 @@ public class SingleGameFactory {
 
         game.rollKeeping(currentPlayer);
         int[] dice = game.getDice();
-        return new GameMessage(currentPlayer, dice, 1, "");
+        sheet = new Sheet(game.getCurrentPlayer().getScored());
+        return new GameMessage(currentPlayer, sheet, dice, 1, "");
     }
 
 }
