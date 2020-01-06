@@ -79,7 +79,9 @@
                     $('#score').html(game.score);
                 }
                 stopAnimation = true;
-                sleep(100).then(() => {displayDice(game.dice);});
+                sleep(100).then(() => {
+                    displayDice(game.dice); 
+                });
 
             }
 
@@ -194,6 +196,9 @@
             }
 
             function rollAnimation(keepArray) {
+                console.log('disable keep');
+                $('#keepBtn').prop("disabled", true);
+
                 stopAnimation = false;
                 recursiveRollAnimation(keepArray, 19)
             }

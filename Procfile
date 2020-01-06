@@ -1,1 +1,1 @@
-web: java -jar target/yahtzee-spring-0.1.0.jar --server.port=$PORT
+web: java -jar target/yahtzee-spring-0.1.0.jar
