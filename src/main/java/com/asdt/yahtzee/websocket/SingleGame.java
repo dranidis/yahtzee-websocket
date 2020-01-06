@@ -1,8 +1,11 @@
-package hello;
+package com.asdt.yahtzee.websocket;
 
 import java.util.concurrent.TimeUnit;
 
 import com.asdt.yahtzee.game.Game;
+import com.asdt.yahtzee.websocket.messages.GameMessage;
+import com.asdt.yahtzee.websocket.messages.KeepMessage;
+import com.asdt.yahtzee.websocket.messages.StringMessage;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessagingTemplate;

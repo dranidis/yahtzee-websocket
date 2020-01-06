@@ -1,6 +1,8 @@
-package hello;
+package com.asdt.yahtzee.websocket.messages;
 
 import java.util.Arrays;
+
+import com.asdt.yahtzee.websocket.Sheet;
 
 public class GameMessage {
     private String currentPlayer;
@@ -29,9 +31,9 @@ public class GameMessage {
         this(playerName, sheet, dice2, roll2, categoryName2);
         this.score = score;
         this.sheet = sheet;
-	}
+    }
 
-	public String getCurrentPlayer() {
+    public String getCurrentPlayer() {
         return currentPlayer;
     }
 

@@ -1,4 +1,4 @@
-package hello;
+package com.asdt.yahtzee.websocket.messages;
 
 public class ScoreMessage {
 

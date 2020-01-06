@@ -1,4 +1,4 @@
-package hello;
+package com.asdt.yahtzee.websocket;
 
 import java.io.IOException;
 import java.util.List;

@@ -1,4 +1,9 @@
-package hello;
+package com.asdt.yahtzee.websocket;
+
+import com.asdt.yahtzee.websocket.messages.GameMessage;
+import com.asdt.yahtzee.websocket.messages.KeepMessage;
+import com.asdt.yahtzee.websocket.messages.PlayerMessage;
+import com.asdt.yahtzee.websocket.messages.ScoreMessage;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.MessageMapping;

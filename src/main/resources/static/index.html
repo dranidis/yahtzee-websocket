@@ -5,315 +5,145 @@
     <title>Yahtzee!</title>
     <link href="css/custom.css" rel="stylesheet">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+
+    <!-- Compiled and minified CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
+    <!-- Compiled and minified JavaScript -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+
+
     <script src="/webjars/sockjs-client/sockjs.min.js"></script>
     <script src="/webjars/stomp-websocket/stomp.min.js"></script>
 
     <script src="js/custom.js"></script>
-
-    <script>
-        $(document).ready(function () {
-            $("#gameControl").hide();
-
-            var playerName;
-            var disabled;
-            var stopAnimation = false;
-
-            function setConnected(connected) {
-                if (connected) {
-                    $("#connected").html("Connected!");
-                }
-                else {
-                    $("#connected").html("Not Connected!");
-                }
-                // $("#greetings").html("");
-            }
-
-            function connect() {
-                var socket = new SockJS('/gamews');
-                stompClient = Stomp.over(socket);
-                stompClient.connect({}, function (frame) {
-                    console.log('Connected: ' + frame);
-                    stompClient.subscribe('/topic/players', function (player) {
-                        showPlayer(JSON.parse(player.body).name);
-                    });
-                    stompClient.subscribe('/topic/game', function (game) {
-                        handleGame(JSON.parse(game.body));
-                    });
-                    stompClient.subscribe('/topic/end', function (end) {
-                        endGame(JSON.parse(end.body).message);
-                    });
-                    stompClient.subscribe('/topic/rolling', function (msg) {
-                        rollAnimation(JSON.parse(msg.body).keep);
-                    });
-
-                    setConnected(true);
-                });
-            }
-            connect();
-            // TODO: After connecting get players already in the game
-
-            function showPlayer(name) {
-                $("#players").append("<div>" + name + "</div>");
-            }
-
-            /*
-            Handle for all players the game broadcast
-            */
-            function handleGame(game) {
-                $("#startBtn").prop("disabled", true);
-                $("#gameControl").show();
-
-                if (game.currentPlayer == playerName) {
-                    disableControl(false);
-                    updateScoreSheet(game);
-                    $('#currentPlayer').html("You");
-                    $('#keepBtn').prop("disabled", game.roll >= 3);
-
-                    if (game.categoryName != "") {
-                        $('#' + game.categoryName).html(game.score);
-                    }
-                } else {
-                    disableControl(true);
-                    $('#currentPlayer').html(game.currentPlayer);
-                    $('#categoryScored').html(game.categoryName);
-                    $('#score').html(game.score);
-                }
-                stopAnimation = true;
-                sleep(100).then(() => {
-                    displayDice(game.dice); 
-                });
-
-            }
-
-            $("#addPlayerBtn").click(function () {
-                var name = $("#playerName").val();
-                // remember the player's name
-                playerName = name;
-
-                if (name != "") {
-                    stompClient.send("/app/player", {}, JSON.stringify({ 'name': name }));
-                    $("#addPlayerBtn").prop("disabled", true);
-                }
-            });
-
-            $("#startBtn").click(function () {
-                stompClient.send("/app/start", {});
-            });
-
-
-            function succesFun(result) {
-                $("#div1").html(result);
-            }
-
-            $('.die').click(function () {
-                if (disabled) return;
-                console.log(this.id);
-                if ($('#' + this.id).hasClass('dieKeep')) {
-                    $('#' + this.id).removeClass('dieKeep');
-                } else {
-                    $('#' + this.id).addClass('dieKeep');
-                }
-            })
-
-            $("#keepBtn").click(function () {
-
-                var keepArray = [];
-                for (i = 1; i < 6; i++) {
-                    if ($('#die' + i).hasClass('dieKeep')) {
-                        // if ($("#keep" + i).is(':checked')) {
-                        keepArray.push(i);
-                    }
-                    // var keepValue = keepArray.join();
-                }
-                stompClient.send("/app/roll", {}, JSON.stringify({ 'name': playerName, 'keep': keepArray }));
-            });
-
-            $(".catscore").click(function () {
-                if (disabled) return; // not your turn!
-
-                var tid = this.id;
-
-                if ($('#' + tid).html() != '') {
-                    return;
-                }
-                stompClient.send("/app/score", {}, JSON.stringify({ 'name': playerName, 'category': this.id }));
-
-                clearKeep();
-            });
-
-            function disableControl(boolean) {
-                console.log("Disable controls :" + boolean)
-                $('#keepBtn').prop("disabled", boolean);
-                $('.keep').prop("disabled", boolean);
-                disabled = boolean;
-            }
-
-            function clearKeep() {
-                // $('.keep').prop('checked', false);
-                for (i = 1; i <= 5; i++) {
-                    $('#die' + i).removeClass('dieKeep');
-                }
-            }
-
-            function updateScoreSheet(game) {
-                console.log("UpdateScoreSheet: " + game.sheet.content.UB + ", " + game.sheet.content.US + ", " + game.sheet.content.YB + ", " + game.sheet.content.TS);
-                $('#UB').html(game.sheet.content.UB);
-                $('#US').html(game.sheet.content.US);
-                $('#YB').html(game.sheet.content.YB);
-                $('#TS').html(game.sheet.content.TS);
-            }
-
-            function displayDice(dice) {
-                for (i = 0; i < 5; i++) {
-                    $('#die' + (i + 1)).html(dice[i]);
-                }
-            }
-
-            function endGame(message) {
-                disableControl(true);
-            }
-
-            // sleep time expects milliseconds
-            function sleep(time) {
-                return new Promise((resolve) => setTimeout(resolve, time));
-            }
-
-            function recursiveRollAnimation(keepArray, step) {
-                // if (step == 0) {
-                if (stopAnimation) {
-                    return;
-                }
-                sleep(50).then(() => {
-                    if (stopAnimation)
-                        return;
-                    for (i = 1; i <= 5 && !stopAnimation; i++) {
-                        if (!keepArray.includes(i)) {
-                            $('#die' + i).html(Math.floor(Math.random() * 5) + 1);
-                        }
-                    }
-                    recursiveRollAnimation(keepArray, step - 1);
-                });
-            }
-
-            function rollAnimation(keepArray) {
-                console.log('disable keep');
-                $('#keepBtn').prop("disabled", true);
-
-                stopAnimation = false;
-                recursiveRollAnimation(keepArray, 19)
-            }
-
-        });
-    </script>
 </head>
 
 <body>
-    <div id="connected"></div>
-    <div>PLAYERS
-        <div id="players"></div>
-    </div>
-
-    <!-- <p>
-        <button id="gameBtn">New Game</button>
-    </p> -->
-    <p>
-        <input id="playerName" type="text" value="" />
-        <button id="addPlayerBtn">Add Player</button>
-    </p>
-    <p>
-        <button id="startBtn">Start</button>
-    </p>
-    <div>Current player:
-        <span id="currentPlayer"></span>
-    </div>
-
-    <div>Scores category:
-        <span id="categoryScored"></span>
-        with a score:
-        <span id="score"></span>
-    </div>
-    <div id="gameControl">
-        <!-- Choose dice to keep:
-            <input type="checkbox" class="keep" id="keep1">
-            <input type="checkbox" class="keep" id="keep2">
-            <input type="checkbox" class="keep" id="keep3">
-            <input type="checkbox" class="keep" id="keep4">
-            <input type="checkbox" class="keep" id="keep5"> -->
-
-        <div>Dice rolled:
-            <span id="dice">
-                <span class="die" id="die1"></span>
-                <span class="die" id="die2"></span>
-                <span class="die" id="die3"></span>
-                <span class="die" id="die4"></span>
-                <span class="die" id="die5"></span>
-            </span>
-            <span><button id="keepBtn">Roll</button></span>
-        </div>
-
-        <div>Your scoresheet
-            <table>
-                <tr>
-                    <td class="catlabel"> 1's</td>
-                    <td class="catscore" id="1s"></td>
-                    <td class="catlabel"> 3 of a kind</td>
-                    <td class="catscore" id="3k"></td>
-                </tr>
-                <tr>
-                    <td class="catlabel"> 2's</td>
-                    <td class="catscore" id="2s"></td>
-                    <td class="catlabel"> 4 of a kind</td>
-                    <td class="catscore" id="4k"></td>
-                </tr>
-                <tr>
-                    <td class="catlabel"> 3's</td>
-                    <td class="catscore" id="3s"></td>
-                    <td class="catlabel"> full house</td>
-                    <td class="catscore" id="fh"></td>
-                </tr>
-                <tr>
-                    <td class="catlabel"> 4's</td>
-                    <td class="catscore" id="4s"></td>
-                    <td class="catlabel"> Sm. Straight</td>
-                    <td class="catscore" id="s4"></td>
-                </tr>
-                <tr>
-                    <td class="catlabel"> 5's</td>
-                    <td class="catscore" id="5s"></td>
-                    <td class="catlabel"> Lg. Straight</td>
-                    <td class="catscore" id="s5"></td>
-                </tr>
-                <tr>
-                    <td class="catlabel"> 6's</td>
-                    <td class="catscore" id="6s"></td>
-                    <td class="catlabel"> Yahtzee</td>
-                    <td class="catscore" id="5k"></td>
-                </tr>
-                <tr>
-                    <td class="catlabel"> Bonus</td>
-                    <td id="UB"></td>
-                    <td class="catlabel"> Chance</td>
-                    <td class="catscore" id="ch"></td>
-                </tr>
-                <tr>
-                    <td class="catlabel"> Section Total</td>
-                    <td id="US"></td>
-                    <td class="catlabel"> Yahtzee Bonus</td>
-                    <td id="YB"></td>
-                </tr>
-                <tr>
-                    <td></td>
-                    <td></td>
-                    <td class="catlabel"> Total</td>
-                    <td id="TS"></td>
-                </tr>
-            </table>
+    <div class="container">
+        <br><br>
+        <h1 class="header center blue-text">Yahtzee</h1>
+        <div class="row center">
+            <div>PLAYERS
+                <div id="players"></div>
+            </div>
+            <div id="nameenter" class="row center">
+                <form class="col s12">
+                    <div class="row ">
+                        <div class="input-field col s8">
+                            <i class="material-icons prefix">account_circle</i>
+                            <input id="playerName" type="text" value="" />
+                            <label for="playerName">First Name</label>
+                        </div>
+                        <div class="input-field col s4">
+                            <button id="addPlayerBtn" class="waves-effect waves-light btn-small">Join</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
-
-    <div id="div1">
-        <h2></h2>
+    <div class="row center">
+        <button id="startBtn" class="waves-effect waves-light btn-small">Start</button>
     </div>
+
+    <div class="row center">
+    </div>
+
+    <div class="container">
+        <div id="gameControl" class="row">
+            <div class="col s2">
+            </div>
+            <div class="col s8">
+                <div>Current player:
+                    <span id="currentPlayer"></span>
+                </div>
+                <div>Scores category:
+                    <span id="categoryScored"></span>
+                    with a score:
+                    <span id="score"></span>
+                </div>
+
+                <div>
+                    <span id="dice">
+                        <span class="die" id="die1"></span>
+                        <span class="die" id="die2"></span>
+                        <span class="die" id="die3"></span>
+                        <span class="die" id="die4"></span>
+                        <span class="die" id="die5"></span>
+                    </span>
+                    <span>
+                        <button id="keepBtn">Roll</button>
+                    </span>
+                </div>
+                <div>Your scoresheet
+                    <table>
+                        <tr>
+                            <td class="catlabel"> 1's</td>
+                            <td class="catscore" id="1s"></td>
+                            <td class="catlabel"> 3 of a kind</td>
+                            <td class="catscore" id="3k"></td>
+                        </tr>
+                        <tr>
+                            <td class="catlabel"> 2's</td>
+                            <td class="catscore" id="2s"></td>
+                            <td class="catlabel"> 4 of a kind</td>
+                            <td class="catscore" id="4k"></td>
+                        </tr>
+                        <tr>
+                            <td class="catlabel"> 3's</td>
+                            <td class="catscore" id="3s"></td>
+                            <td class="catlabel"> full house</td>
+                            <td class="catscore" id="fh"></td>
+                        </tr>
+                        <tr>
+                            <td class="catlabel"> 4's</td>
+                            <td class="catscore" id="4s"></td>
+                            <td class="catlabel"> Sm. Straight</td>
+                            <td class="catscore" id="s4"></td>
+                        </tr>
+                        <tr>
+                            <td class="catlabel"> 5's</td>
+                            <td class="catscore" id="5s"></td>
+                            <td class="catlabel"> Lg. Straight</td>
+                            <td class="catscore" id="s5"></td>
+                        </tr>
+                        <tr>
+                            <td class="catlabel"> 6's</td>
+                            <td class="catscore" id="6s"></td>
+                            <td class="catlabel"> Yahtzee</td>
+                            <td class="catscore" id="5k"></td>
+                        </tr>
+                        <tr>
+                            <td class="catlabel"> Bonus</td>
+                            <td id="UB"></td>
+                            <td class="catlabel"> Chance</td>
+                            <td class="catscore" id="ch"></td>
+                        </tr>
+                        <tr>
+                            <td class="catlabel"> Section Total</td>
+                            <td id="US"></td>
+                            <td class="catlabel"> Yahtzee Bonus</td>
+                            <td id="YB"></td>
+                        </tr>
+                        <tr>
+                            <td></td>
+                            <td></td>
+                            <td class="catlabel"> Total</td>
+                            <td id="TS"></td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+            <div class="col s2">
+            </div>
+        </div>
+    </div>
+
+    </div>
+
+
 </body>
 
 </html>
