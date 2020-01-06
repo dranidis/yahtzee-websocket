@@ -11,3 +11,17 @@ td {
     text-align: right;
     min-width: 2em;
 }
+
+.die {
+    font-size: xx-large;
+    color: darkred;
+    display: inline-block;
+    width: 50px;
+    text-align: center;
+    cursor: no-drop;
+}
+
+.dieKeep {
+    color: indianred;
+    cursor: default;
+}

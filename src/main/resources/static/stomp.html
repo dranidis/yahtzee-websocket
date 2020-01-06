@@ -74,13 +74,7 @@
                     $('#score').html(game.score);
                 }
 
-                $('#dice').html(
-                    game.dice[0] + " " +
-                    game.dice[1] + " " +
-                    game.dice[2] + " " +
-                    game.dice[3] + " " +
-                    game.dice[4] + " "
-                );
+                displayDice(game.dice);
 
             }
 
@@ -104,15 +98,29 @@
                 $("#div1").html(result);
             }
 
+            $('.die').click(function () {
+                if (disabled) return;
+                console.log(this.id);
+                if ($('#' + this.id).hasClass('dieKeep')) {
+                    $('#' + this.id).removeClass('dieKeep');
+                } else {
+                    $('#' + this.id).addClass('dieKeep');
+                }
+            })
+
             $("#keepBtn").click(function () {
                 var keepArray = [];
                 for (i = 1; i < 6; i++) {
-                    if ($("#keep" + i).is(':checked')) {
+                    if ($('#die' + i).hasClass('dieKeep')) {
+                        // if ($("#keep" + i).is(':checked')) {
                         keepArray.push(i);
                     }
                     // var keepValue = keepArray.join();
                 }
-                stompClient.send("/app/roll", {}, JSON.stringify({ 'name': playerName, 'keep': keepArray }));
+                rollAnimation(keepArray);
+                sleep(1000).then(() => {
+                    stompClient.send("/app/roll", {}, JSON.stringify({ 'name': playerName, 'keep': keepArray }));
+                })
 
             });
 
@@ -137,10 +145,13 @@
             }
 
             function clearKeep() {
-                $('.keep').prop('checked', false);
+                // $('.keep').prop('checked', false);
+                for (i = 1; i <= 5; i++) {
+                    $('#die' + i).removeClass('dieKeep');
+                }
             }
 
-            function updateScoreSheet(game) { 
+            function updateScoreSheet(game) {
                 console.log("UpdateScoreSheet: " + game.sheet.content.UB + ", " + game.sheet.content.US + ", " + game.sheet.content.YB + ", " + game.sheet.content.TS);
                 $('#UB').html(game.sheet.content.UB);
                 $('#US').html(game.sheet.content.US);
@@ -148,8 +159,37 @@
                 $('#TS').html(game.sheet.content.TS);
             }
 
+            function displayDice(dice) {
+                for (i = 0; i < 5; i++) {
+                    $('#die' + (i + 1)).html(dice[i]);
+                }
+            }
+
             function endGame(message) {
                 disableControl(true);
+            }
+
+            // sleep time expects milliseconds
+            function sleep(time) {
+                return new Promise((resolve) => setTimeout(resolve, time));
+            }
+
+            function recursiveRollAnimation(keepArray, step) {
+                if (step == 0) {
+                    return;
+                }
+                sleep(50).then(() => {
+                    for (i = 1; i <= 5; i++) {
+                        if (!keepArray.includes(i)) {
+                            $('#die' + i).html(Math.floor(Math.random() * 5) + 1);
+                        }
+                    }
+                    recursiveRollAnimation(keepArray, step - 1);
+                });
+            }
+
+            function rollAnimation(keepArray) {
+                recursiveRollAnimation(keepArray, 19)
             }
 
         });
@@ -176,14 +216,19 @@
         <div id="currentPlayer"></div>
     </div>
     <div>Dice rolled:
-        <div id="dice"></div>
+        <span id="dice">
+            <span class="die" id="die1"></span>
+            <span class="die" id="die2"></span>
+            <span class="die" id="die3"></span>
+            <span class="die" id="die4"></span>
+            <span class="die" id="die5"></span>
+        </span>
     </div>
     <div>Category score
         <div id="categoryScored"></div>
         <div id="score"></div>
     </div>
     <div id="gameControl">
-        <div id="dice"></div>
         <p>
             Choose dice to keep:
             <input type="checkbox" class="keep" id="keep1">
