@@ -41,6 +41,10 @@
                     stompClient.subscribe('/topic/end', function (end) {
                         endGame(JSON.parse(end.body).message);
                     });
+                    stompClient.subscribe('/topic/rolling', function (msg) {
+                        rollAnimation(JSON.parse(msg.body).keep);
+                    });
+
                     setConnected(true);
                 });
             }
@@ -117,11 +121,7 @@
                     }
                     // var keepValue = keepArray.join();
                 }
-                rollAnimation(keepArray);
-                sleep(1000).then(() => {
                     stompClient.send("/app/roll", {}, JSON.stringify({ 'name': playerName, 'keep': keepArray }));
-                })
-
             });
 
             $(".catscore").click(function () {
