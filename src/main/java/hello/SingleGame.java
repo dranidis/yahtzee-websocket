@@ -39,7 +39,8 @@ public class SingleGame {
 
         messageSender.convertAndSend("/topic/game", new GameMessage(currentPlayer, sheet, game.getDice(),
                 game.getCurrentPlayer().getRoll(), ""));
-        rolling(currentPlayer, new int[5]);
+
+        rolling(currentPlayer, new int[]{});
 
         int[] dice = game.getDice();
         sheet = new Sheet(game.getCurrentPlayer().getFullScoreSheet());
@@ -81,7 +82,7 @@ public class SingleGame {
             }
         }
 
-        rolling(currentPlayer, new int[5]);
+        rolling(currentPlayer, new int[]{});
 
         int[] dice = game.getDice();
         sheet = new Sheet(game.getCurrentPlayer().getFullScoreSheet());
