@@ -2,6 +2,7 @@ package com.asdt.yahtzee.game;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Map;
 
 import com.asdt.yahtzee.game.score.ScoreFactory;
@@ -75,6 +76,19 @@ public class Player {
         sb.append("\nDice: " + new ArrayList<Die>(Arrays.asList(dice)) + "\nKept: " + keptToString());
         return sb.toString();
     }
+
+    public Map<String, Integer> getFullScoreSheet() {
+        Map<String, Integer> fullScoreSheet = new HashMap<>(scored);
+        fullScoreSheet.put("US", getUSScore());
+        fullScoreSheet.put("TS", getScore());
+        if (fullScoreSheet.get("UB") == null) {
+            fullScoreSheet.put("UB", 0);
+        }
+        if (fullScoreSheet.get("YB") == null) {
+            fullScoreSheet.put("YB", 0);
+        }
+        return fullScoreSheet;
+    } 
 
     private String getScoreSheet() {
         int upperScore = getUSScore();

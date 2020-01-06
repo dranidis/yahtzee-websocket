@@ -1,8 +1,13 @@
 body {
-    background-color: lightblue;
+    background-color: burlywood;
 }
 
 .catscore {
     /* display: none; */
-    background-color: grey;
+    background-color: whitesmoke;
+}
+
+td {
+    text-align: right;
+    min-width: 2em;
 }
