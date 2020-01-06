@@ -15,7 +15,7 @@ import org.springframework.stereotype.Controller;
 public class GameAppController {
 
     @Autowired
-    SingleGameFactory singleGameFactory;
+    SingleGame singleGameFactory;
 
     /**
      * Method receives a message, handles it and

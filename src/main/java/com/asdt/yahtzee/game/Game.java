@@ -19,6 +19,8 @@ public class Game {
     private Map<String, Player> players = new HashMap<>();
     private ArrayList<Player> roundPlayers;
 
+    int round = 0;
+
     public Game() {
         roundPlayers = new ArrayList<Player>(players.values());
     }
@@ -87,6 +89,7 @@ public class Game {
     }
 
     public void startRound() {
+        round++;
         roundPlayers = new ArrayList<Player>(players.values());
         currentPlayerIndex = 0;
         currentPlayer = roundPlayers.get(currentPlayerIndex);
@@ -110,6 +113,10 @@ public class Game {
 
     public Player getCurrentPlayer() {
         return currentPlayer;
+    }
+
+    public int getRound() {
+        return round;
     }
 
 }

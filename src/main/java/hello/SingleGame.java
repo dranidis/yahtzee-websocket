@@ -7,7 +7,7 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Component;
 
 @Component
-public class SingleGameFactory {
+public class SingleGame {
     private Game game;
 
     public void addPlayer(String name) {
@@ -52,9 +52,13 @@ public class SingleGameFactory {
                 new GameMessage(playerName, sheet, game.getDice(), game.getCurrentPlayer().getRoll(), categoryName, score));
 
         String currentPlayer = game.getNextPlayer();
-        if (currentPlayer == null ) {
-            game.startRound();
-            currentPlayer = game.getNextPlayer();
+        if (currentPlayer == null ) { // round has ended
+            if (game.getRound() < 13) {
+                game.startRound();
+                currentPlayer = game.getNextPlayer();
+            } else { // game has ended
+                messageSender.convertAndSend("/topic/end", new StringMessage("END"));
+            }
         }
 
         game.rollKeeping(currentPlayer);

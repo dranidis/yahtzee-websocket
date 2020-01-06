@@ -33,12 +33,13 @@
                 stompClient.connect({}, function (frame) {
                     console.log('Connected: ' + frame);
                     stompClient.subscribe('/topic/players', function (player) {
-                        // console.log("received from /topic/players:" + player.body)
                         showPlayer(JSON.parse(player.body).name);
                     });
                     stompClient.subscribe('/topic/game', function (game) {
-                        // console.log("received from /topic/game:" + game.body)
                         handleGame(JSON.parse(game.body));
+                    });
+                    stompClient.subscribe('/topic/end', function (end) {
+                        endGame(JSON.parse(end.body).message);
                     });
                     setConnected(true);
                 });
@@ -147,6 +148,9 @@
                 $('#TS').html(game.sheet.content.TS);
             }
 
+            function endGame(message) {
+                disableControl(true);
+            }
 
         });
     </script>
