@@ -2,17 +2,20 @@ package com.asdt.yahtzee.websocket.messages;
 
 import java.util.Arrays;
 
-import com.asdt.yahtzee.websocket.Sheet;
-
-public class GameMessage {
+public class GameResponse {
+    int round;
     private String currentPlayer;
     private int roll;
     int[] dice;
     private String categoryName;
     private int score;
-    private Sheet sheet;
+    private SheetSubResponse sheet;
 
-    public GameMessage(String currentPlayer, Sheet sheet, int[] dice, int roll, String categoryName) {
+    public GameResponse() {
+    }
+
+    public GameResponse(int round, String currentPlayer, SheetSubResponse sheet, int[] dice, int roll, String categoryName, int score) {
+        this.round = round;
         this.currentPlayer = currentPlayer;
         this.dice = new int[dice.length];
         for (int i = 0; i < dice.length; i++) {
@@ -21,16 +24,7 @@ public class GameMessage {
         this.roll = roll;
         this.categoryName = categoryName;
         this.sheet = sheet;
-    }
-
-    public GameMessage() {
-
-    }
-
-    public GameMessage(String playerName, Sheet sheet, int[] dice2, int roll2, String categoryName2, int score) {
-        this(playerName, sheet, dice2, roll2, categoryName2);
         this.score = score;
-        this.sheet = sheet;
     }
 
     public String getCurrentPlayer() {
@@ -79,12 +73,20 @@ public class GameMessage {
         this.score = score;
     }
 
-    public Sheet getSheet() {
+    public SheetSubResponse getSheet() {
         return sheet;
     }
 
-    public void setSheet(Sheet sheet) {
+    public void setSheet(SheetSubResponse sheet) {
         this.sheet = sheet;
+    }
+
+    public int getRound() {
+        return round;
+    }
+
+    public void setRound(int round) {
+        this.round = round;
     }
 
 }

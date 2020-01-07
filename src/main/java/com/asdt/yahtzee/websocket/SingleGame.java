@@ -1,10 +1,13 @@
 package com.asdt.yahtzee.websocket;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import com.asdt.yahtzee.game.Game;
-import com.asdt.yahtzee.websocket.messages.GameMessage;
+import com.asdt.yahtzee.websocket.messages.GameResponse;
 import com.asdt.yahtzee.websocket.messages.KeepMessage;
+import com.asdt.yahtzee.websocket.messages.SheetSubResponse;
 import com.asdt.yahtzee.websocket.messages.StringMessage;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,65 +18,71 @@ import org.springframework.stereotype.Component;
 public class SingleGame {
     private Game game;
 
+    List<String> players = new ArrayList<>();
+
     public void addPlayer(String name) {
-        if (game == null) {
-            game = new Game();
-        }
-        game.addPlayer(name);
+        players.add(name);
+        // if (game == null || game.getRound() > 13) {
+        //     game = new Game();
+        // }
+        // game.addPlayer(name);
     }
 
     private void rolling(String currentPlayer, int[] keep) {
         messageSender.convertAndSend("/topic/rolling", new KeepMessage(currentPlayer, keep));
         try {
-            TimeUnit.SECONDS.sleep(1);
+            TimeUnit.MILLISECONDS.sleep(500);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
         game.rollKeeping(currentPlayer, keep);
-
     }
 
-    public GameMessage start() {
+    public GameResponse start() {
+        game = new Game();
+        for (String player : players)
+            game.addPlayer(player);
+
         game.startRound();
         System.out.println("Game started with " + game.getPlayers().keySet());
 
         String currentPlayer = game.getNextPlayer();
-        Sheet sheet = new Sheet(game.getCurrentPlayer().getFullScoreSheet());
+        SheetSubResponse sheet = new SheetSubResponse(game.getCurrentPlayer().getFullScoreSheet());
 
-        messageSender.convertAndSend("/topic/game", new GameMessage(currentPlayer, sheet, game.getDice(),
-                game.getCurrentPlayer().getRoll(), ""));
+        messageSender.convertAndSend("/topic/game", new GameResponse(game.getRound(), currentPlayer, sheet,
+                game.getDice(), game.getCurrentPlayer().getRoll(), "", 0));
 
-        rolling(currentPlayer, new int[]{});
+        rolling(currentPlayer, new int[] {});
 
         int[] dice = game.getDice();
-        sheet = new Sheet(game.getCurrentPlayer().getFullScoreSheet());
-        return new GameMessage(currentPlayer, sheet, dice, 1, "");
+        sheet = new SheetSubResponse(game.getCurrentPlayer().getFullScoreSheet());
+        return new GameResponse(game.getRound(), currentPlayer, sheet, dice, 1, "", 0);
     }
 
-    public GameMessage rollKeeping(String currentPlayer, int[] keep) {
+    public GameResponse rollKeeping(String currentPlayer, int[] keep) {
         int roll = game.getCurrentPlayer().getRoll();
         if (roll <= 3) {
 
             rolling(currentPlayer, keep);
 
             int[] dice = game.getDice();
-            Sheet sheet = new Sheet(game.getCurrentPlayer().getFullScoreSheet());
-            return new GameMessage(currentPlayer, sheet, dice, roll, "");
+            SheetSubResponse sheet = new SheetSubResponse(game.getCurrentPlayer().getFullScoreSheet());
+            return new GameResponse(game.getRound(), currentPlayer, sheet, dice, roll, "", 0);
         }
-        // TODO: throw exception?
         return null;
     }
 
     @Autowired
     private SimpMessagingTemplate messageSender;
 
-    public GameMessage scoreCategory(String playerName, String categoryName) {
+    public GameResponse scoreCategory(String playerName, String categoryName) {
         int score = game.scoreACategory(playerName, categoryName);
-        Sheet sheet = new Sheet(game.getCurrentPlayer().getFullScoreSheet());
+        SheetSubResponse sheet = new SheetSubResponse(game.getCurrentPlayer().getFullScoreSheet());
 
-        System.out.println("Sending game to topic/game with messageSender:" + messageSender);
-        messageSender.convertAndSend("/topic/game", new GameMessage(playerName, sheet, game.getDice(),
-                game.getCurrentPlayer().getRoll(), categoryName, score));
+        GameResponse msg = new GameResponse(game.getRound(), playerName, sheet, game.getDice(),
+                game.getCurrentPlayer().getRoll(), categoryName, score);
+
+        messageSender.convertAndSend("/topic/game", msg);
 
         String currentPlayer = game.getNextPlayer();
         if (currentPlayer == null) { // round has ended
@@ -82,14 +91,15 @@ public class SingleGame {
                 currentPlayer = game.getNextPlayer();
             } else { // game has ended
                 messageSender.convertAndSend("/topic/end", new StringMessage("END"));
+                return null; // will be ignored
             }
         }
 
-        rolling(currentPlayer, new int[]{});
+        rolling(currentPlayer, new int[] {});
 
         int[] dice = game.getDice();
-        sheet = new Sheet(game.getCurrentPlayer().getFullScoreSheet());
-        return new GameMessage(currentPlayer, sheet, dice, 1, "");
+        sheet = new SheetSubResponse(game.getCurrentPlayer().getFullScoreSheet());
+        return new GameResponse(game.getRound(), currentPlayer, sheet, dice, 1, "", 0);
     }
 
 }

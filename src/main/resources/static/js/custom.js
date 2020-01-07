@@ -5,16 +5,7 @@ $(document).ready(function () {
     var playerName;
     var disabled;
     var stopAnimation = false;
-
-    function setConnected(connected) {
-        if (connected) {
-            // $("#connected").html("Connected!");
-        }
-        else {
-            // $("#connected").html("Not Connected!");
-        }
-        // $("#greetings").html("");
-    }
+    var end = false;
 
     function connect() {
         var socket = new SockJS('/gamews');
@@ -22,21 +13,19 @@ $(document).ready(function () {
         stompClient.connect({}, function (frame) {
             console.log('Connected: ' + frame);
             stompClient.subscribe('/topic/players', function (player) {
-                $('#startBtn').show();
-
                 showPlayer(JSON.parse(player.body).name);
             });
             stompClient.subscribe('/topic/game', function (game) {
-                handleGame(JSON.parse(game.body));
+                if (!end)
+                    handleGame(JSON.parse(game.body));
             });
-            stompClient.subscribe('/topic/end', function (end) {
-                endGame(JSON.parse(end.body).message);
+            stompClient.subscribe('/topic/end', function (endresponse) {
+                end = true;
+                endGame(JSON.parse(endresponse.body).message);
             });
             stompClient.subscribe('/topic/rolling', function (msg) {
                 rollAnimation(JSON.parse(msg.body).keep);
             });
-
-            // setConnected(true);
         });
     }
     connect();
@@ -84,6 +73,7 @@ $(document).ready(function () {
             stompClient.send("/app/player", {}, JSON.stringify({ 'name': name }));
             $("#addPlayerBtn").prop("disabled", true);
             $('#nameenter').hide();
+            $('#startBtn').show();
         }
     });
 
@@ -107,7 +97,6 @@ $(document).ready(function () {
     })
 
     $("#keepBtn").click(function () {
-
         var keepArray = [];
         for (i = 1; i < 6; i++) {
             if ($('#die' + i).hasClass('dieKeep')) {
@@ -134,6 +123,7 @@ $(document).ready(function () {
 
     function disableControl(boolean) {
         console.log("Disable controls :" + boolean)
+
         $('#keepBtn').prop("disabled", boolean);
         $('.keep').prop("disabled", boolean);
         disabled = boolean;
@@ -170,7 +160,6 @@ $(document).ready(function () {
     }
 
     function recursiveRollAnimation(keepArray, step) {
-        // if (step == 0) {
         if (stopAnimation) {
             return;
         }
@@ -188,8 +177,8 @@ $(document).ready(function () {
 
     function rollAnimation(keepArray) {
         console.log('disable keep');
-        $('#keepBtn').prop("disabled", true);
-
+        // $('#keepBtn').prop("disabled", true);
+        disableControl(true);
         stopAnimation = false;
         recursiveRollAnimation(keepArray, 19)
     }

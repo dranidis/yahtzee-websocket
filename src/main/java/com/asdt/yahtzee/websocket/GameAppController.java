@@ -1,6 +1,6 @@
 package com.asdt.yahtzee.websocket;
 
-import com.asdt.yahtzee.websocket.messages.GameMessage;
+import com.asdt.yahtzee.websocket.messages.GameResponse;
 import com.asdt.yahtzee.websocket.messages.KeepMessage;
 import com.asdt.yahtzee.websocket.messages.PlayerMessage;
 import com.asdt.yahtzee.websocket.messages.ScoreMessage;
@@ -38,25 +38,25 @@ public class GameAppController {
 
     @MessageMapping("/start")
     @SendTo("/topic/game")
-    public GameMessage startGame() {
+    public GameResponse startGame() {
         System.out.println("startGame: ");
-        GameMessage gameMsg = singleGameFactory.start();
+        GameResponse gameMsg = singleGameFactory.start();
         return gameMsg;
     }
 
     @MessageMapping("/roll")
     @SendTo("/topic/game")
-    public GameMessage roll(KeepMessage keepMsg) {
+    public GameResponse roll(KeepMessage keepMsg) {
         System.out.println("keepMsg: " + keepMsg);
-        GameMessage gameMsg = singleGameFactory.rollKeeping(keepMsg.getName(), keepMsg.getKeep());
+        GameResponse gameMsg = singleGameFactory.rollKeeping(keepMsg.getName(), keepMsg.getKeep());
         return gameMsg;
     }
 
     @MessageMapping("/score")
     @SendTo("/topic/game")
-    public GameMessage roll(ScoreMessage scoreMsg) {
+    public GameResponse roll(ScoreMessage scoreMsg) {
         System.out.println("scoreMsg: " + scoreMsg);
-        GameMessage gameMsg = singleGameFactory.scoreCategory(scoreMsg.getName(), scoreMsg.getCategory());
+        GameResponse gameMsg = singleGameFactory.scoreCategory(scoreMsg.getName(), scoreMsg.getCategory());
         return gameMsg;
     }
 

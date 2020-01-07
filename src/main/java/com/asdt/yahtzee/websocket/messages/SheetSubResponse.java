@@ -1,15 +1,15 @@
-package com.asdt.yahtzee.websocket;
+package com.asdt.yahtzee.websocket.messages;
 
 import java.util.Map;
 
-public class Sheet {
+public class SheetSubResponse {
 
 	private Map<String, Integer> content = null;
 
-	public Sheet() {
+	public SheetSubResponse() {
 	}
 
-	public Sheet(Map<String, Integer> content) {
+	public SheetSubResponse(Map<String, Integer> content) {
 		this.content = content;
 	}
 
