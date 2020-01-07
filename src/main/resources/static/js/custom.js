@@ -3,6 +3,7 @@ $(document).ready(function () {
     $("#playerList").hide();
     $('#startBtn').hide();
 
+    var MS_DELAY = 500; // milliseconds delay for dice animation
     var playerName;
     var disabled;
     var stopAnimation = false;
@@ -113,7 +114,7 @@ $(document).ready(function () {
             }
             // var keepValue = keepArray.join();
         }
-        stompClient.send("/app/roll", {}, JSON.stringify({ 'name': playerName, 'keep': keepArray }));
+        stompClient.send("/app/roll", {}, JSON.stringify({ 'name': playerName, 'keep': keepArray, msDelay: MS_DELAY }));
     });
 
     $(".catscore").click(function () {

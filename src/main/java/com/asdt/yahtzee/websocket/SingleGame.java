@@ -19,6 +19,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class SingleGame {
     private Game game;
+    int msDelay = 500; // TODO get from UI
 
     Set<String> players = new HashSet<>();
 
@@ -27,10 +28,10 @@ public class SingleGame {
         return new ArrayList<>(players);
     }
 
-    private void rolling(String currentPlayer, int[] keep) {
-        messageSender.convertAndSend("/topic/rolling", new KeepMessage(currentPlayer, keep));
+    private void rolling(String currentPlayer, int[] keep, int msDelay) {
+        messageSender.convertAndSend("/topic/rolling", new KeepMessage(currentPlayer, keep, msDelay));
         try {
-            TimeUnit.MILLISECONDS.sleep(500);
+            TimeUnit.MILLISECONDS.sleep(msDelay); // for the animation in the UI
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -51,22 +52,23 @@ public class SingleGame {
         messageSender.convertAndSend("/topic/game", new GameResponse(game.getRound(), currentPlayer, sheet,
                 game.getDice(), game.getCurrentPlayer().getRoll(), "", 0));
 
-        rolling(currentPlayer, new int[] {});
+        rolling(currentPlayer, new int[] {}, msDelay);
 
         int[] dice = game.getDice();
         sheet = new SheetSubResponse(game.getCurrentPlayer().getFullScoreSheet());
         return new GameResponse(game.getRound(), currentPlayer, sheet, dice, 1, "", 0);
     }
 
-    public GameResponse rollKeeping(String currentPlayer, int[] keep) {
+    public GameResponse rollKeeping(KeepMessage keepMsg) {
+        msDelay = keepMsg.getMsDelay();
         int roll = game.getCurrentPlayer().getRoll();
         if (roll <= 3) {
 
-            rolling(currentPlayer, keep);
+            rolling(keepMsg.getName(), keepMsg.getKeep(), msDelay);
 
             int[] dice = game.getDice();
             SheetSubResponse sheet = new SheetSubResponse(game.getCurrentPlayer().getFullScoreSheet());
-            return new GameResponse(game.getRound(), currentPlayer, sheet, dice, roll, "", 0);
+            return new GameResponse(game.getRound(), keepMsg.getName(), sheet, dice, roll, "", 0);
         }
         return null;
     }
@@ -94,7 +96,7 @@ public class SingleGame {
             }
         }
 
-        rolling(currentPlayer, new int[] {});
+        rolling(currentPlayer, new int[] {}, msDelay);
 
         int[] dice = game.getDice();
         sheet = new SheetSubResponse(game.getCurrentPlayer().getFullScoreSheet());

@@ -52,7 +52,7 @@ public class GameAppController {
     @SendTo("/topic/game")
     public GameResponse roll(KeepMessage keepMsg) {
         System.out.println("keepMsg: " + keepMsg);
-        GameResponse gameMsg = singleGameFactory.rollKeeping(keepMsg.getName(), keepMsg.getKeep());
+        GameResponse gameMsg = singleGameFactory.rollKeeping(keepMsg);
         return gameMsg;
     }
 

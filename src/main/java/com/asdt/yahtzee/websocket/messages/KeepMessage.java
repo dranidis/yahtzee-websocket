@@ -4,7 +4,8 @@ import java.util.Arrays;
 
 public class KeepMessage {
     private String name;
-    int[] keep;
+    private int[] keep;
+    private int msDelay;
 
     public String getName() {
         return name;
@@ -22,9 +23,10 @@ public class KeepMessage {
         this.keep = keep;
     }
 
-    public KeepMessage(String name, int[] keep) {
+    public KeepMessage(String name, int[] keep, int msDelay) {
         this.name = name;
         this.keep = keep;
+        this.msDelay =msDelay;
     }
 
     public KeepMessage() {
@@ -32,7 +34,15 @@ public class KeepMessage {
 
     @Override
     public String toString() {
-        return "KeepMessage [keep=" + Arrays.toString(keep) + ", name=" + name + "]";
+        return "KeepMessage [keep=" + Arrays.toString(keep) + ", msDelay=" + msDelay + ", name=" + name + "]";
+    }
+
+    public int getMsDelay() {
+        return msDelay;
+    }
+
+    public void setMsDelay(int msDelay) {
+        this.msDelay = msDelay;
     }
 
 }
