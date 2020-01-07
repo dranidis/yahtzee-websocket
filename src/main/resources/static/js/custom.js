@@ -1,11 +1,13 @@
 $(document).ready(function () {
     $("#gameControl").hide();
+    $("#playerList").hide();
     $('#startBtn').hide();
 
     var playerName;
     var disabled;
     var stopAnimation = false;
     var end = false;
+    var entered = false;
 
     function connect() {
         var socket = new SockJS('/gamews');
@@ -13,7 +15,7 @@ $(document).ready(function () {
         stompClient.connect({}, function (frame) {
             console.log('Connected: ' + frame);
             stompClient.subscribe('/topic/players', function (player) {
-                showPlayer(JSON.parse(player.body).name);
+                showPlayers(JSON.parse(player.body).players);
             });
             stompClient.subscribe('/topic/game', function (game) {
                 if (!end)
@@ -31,8 +33,12 @@ $(document).ready(function () {
     connect();
     // TODO: After connecting get players already in the game
 
-    function showPlayer(name) {
-        $("#players").append("<div>" + name + "</div>");
+    function showPlayers(players) {
+        $('#players').html(players.map(function(p){
+            return "<div>" + p + "</div>"
+        }))
+
+        // $("#players").append("<div>" + name + "</div>");
     }
 
     /*
@@ -62,19 +68,19 @@ $(document).ready(function () {
         sleep(100).then(() => {
             displayDice(game.dice);
         });
-
     }
 
     $("#addPlayerBtn").click(function () {
         var name = $("#playerName").val();
-        // remember the player's name
         playerName = name;
 
         if (name != "") {
             stompClient.send("/app/player", {}, JSON.stringify({ 'name': name }));
             $("#addPlayerBtn").prop("disabled", true);
             $('#nameenter').hide();
+            $("#playerList").show();
             $('#startBtn').show();
+            entered = true;
         }
     });
 

@@ -1,7 +1,10 @@
 package com.asdt.yahtzee.websocket;
 
+import java.util.List;
+
 import com.asdt.yahtzee.websocket.messages.GameResponse;
 import com.asdt.yahtzee.websocket.messages.KeepMessage;
+import com.asdt.yahtzee.websocket.messages.PlayerListMessage;
 import com.asdt.yahtzee.websocket.messages.PlayerMessage;
 import com.asdt.yahtzee.websocket.messages.ScoreMessage;
 
@@ -23,17 +26,18 @@ public class GameAppController {
     SingleGame singleGameFactory;
 
     /**
-     * Method receives a message, handles it and
-     * then sends the message to the broker
+     * Method receives a message, handles it and then sends the message to the
+     * broker
+     * 
      * @param playerMsg
      * @return
      */
     @MessageMapping("/player")
     @SendTo("/topic/players")
-    public PlayerMessage addPlayer(PlayerMessage playerMsg) {
+    public PlayerListMessage addPlayer(PlayerMessage playerMsg) {
         System.out.println("addPlayer : " + playerMsg);
-        singleGameFactory.addPlayer(playerMsg.getName());
-        return playerMsg;
+        List<String> players = singleGameFactory.addPlayer(playerMsg.getName());
+        return new PlayerListMessage(players);
     }
 
     @MessageMapping("/start")

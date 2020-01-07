@@ -1,7 +1,9 @@
 package com.asdt.yahtzee.websocket;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import com.asdt.yahtzee.game.Game;
@@ -18,14 +20,11 @@ import org.springframework.stereotype.Component;
 public class SingleGame {
     private Game game;
 
-    List<String> players = new ArrayList<>();
+    Set<String> players = new HashSet<>();
 
-    public void addPlayer(String name) {
+    public List<String> addPlayer(String name) {
         players.add(name);
-        // if (game == null || game.getRound() > 13) {
-        //     game = new Game();
-        // }
-        // game.addPlayer(name);
+        return new ArrayList<>(players);
     }
 
     private void rolling(String currentPlayer, int[] keep) {
