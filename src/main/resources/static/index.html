@@ -3,7 +3,6 @@
 
 <head>
     <title>Yahtzee!</title>
-    <link href="css/custom.css" rel="stylesheet">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
 
     <!-- Compiled and minified CSS -->
@@ -17,11 +16,12 @@
     <script src="/webjars/sockjs-client/sockjs.min.js"></script>
     <script src="/webjars/stomp-websocket/stomp.min.js"></script>
 
+    <link href="css/custom.css" rel="stylesheet">
     <script src="js/custom.js"></script>
 </head>
 
 <body>
-    <div class="container">
+    <div id="startContainer" class="container">
         <br><br>
         <h1 class="header center blue-text">Yahtzee</h1>
         <div class="row center">
@@ -43,29 +43,29 @@
                 </form>
             </div>
         </div>
-    </div>
-    <div class="row center">
-        <button id="startBtn" class="waves-effect waves-light btn-small">Start</button>
-    </div>
-
-    <div class="row center">
+        <div class="row center">
+            <button id="startBtn" class="waves-effect waves-light btn-small">Start</button>
+        </div>
     </div>
 
-    <div class="container">
-        <div id="gameControl" class="row">
+    <div id="gameControl" class="container">
+        <div class="row center">
+            <div>
+                <i class="material-icons prefix">account_circle</i>
+                <span id="currentPlayer"></span>
+            </div>
+            <div>Scores category:
+                <span id="categoryScored"></span>
+                with a score:
+                <span id="score"></span>
+            </div>
+        </div>
+        <div class="row center">
             <div class="col s2">
             </div>
             <div class="col s8">
-                <div>Current player:
-                    <span id="currentPlayer"></span>
-                </div>
-                <div>Scores category:
-                    <span id="categoryScored"></span>
-                    with a score:
-                    <span id="score"></span>
-                </div>
 
-                <div>
+                <div class="row center">
                     <span id="dice">
                         <span class="die" id="die1"></span>
                         <span class="die" id="die2"></span>
@@ -73,11 +73,13 @@
                         <span class="die" id="die4"></span>
                         <span class="die" id="die5"></span>
                     </span>
+                </div>
+                <div class="row center">
                     <span>
-                        <button id="keepBtn">Roll</button>
+                        <button id="keepBtn" class="waves-effect waves-light btn-small">Roll</button>
                     </span>
                 </div>
-                <div>Your scoresheet
+                <div class="row center">
                     <table>
                         <tr>
                             <td class="catlabel">1's</td>

@@ -40,6 +40,7 @@ $(document).ready(function () {
     */
     function handleGame(game) {
         $("#startBtn").prop("disabled", true);
+        $('#startContainer').hide();
         $("#gameControl").show();
 
         if (game.currentPlayer == playerName) {
@@ -79,6 +80,7 @@ $(document).ready(function () {
 
     $("#startBtn").click(function () {
         stompClient.send("/app/start", {});
+        $('#startContainer').hide();
     });
 
 

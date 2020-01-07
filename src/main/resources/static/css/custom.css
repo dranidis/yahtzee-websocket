@@ -11,6 +11,8 @@ body {
 td {
     text-align: right;
     min-width: 2em;
+    padding:5px;
+
 }
 
 .die {
