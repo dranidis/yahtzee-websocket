@@ -1,6 +1,7 @@
 package com.asdt.yahtzee.websocket;
 
 import java.util.List;
+import java.util.Map;
 
 import com.asdt.yahtzee.websocket.messages.GameResponse;
 import com.asdt.yahtzee.websocket.messages.KeepMessage;
@@ -11,6 +12,7 @@ import com.asdt.yahtzee.websocket.messages.ScoreMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
+import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.stereotype.Controller;
 
 /**
@@ -34,9 +36,14 @@ public class GameAppController {
      */
     @MessageMapping("/player")
     @SendTo("/topic/players")
-    public PlayerListMessage addPlayer(PlayerMessage playerMsg) {
-        System.out.println("addPlayer : " + playerMsg);
-        List<String> players = singleGameFactory.addPlayer(playerMsg.getName());
+    public PlayerListMessage addPlayer(PlayerMessage playerMsg, SimpMessageHeaderAccessor headerAccessor) {
+        Map<String, Object> sessionAttributes = headerAccessor.getSessionAttributes();
+        
+        String playerName = playerMsg.getName();
+        String sessionId = (String) sessionAttributes.get("SessionId");
+        PlayerCatalog.getInstance().updateName(sessionId, playerName);
+        
+        List<String> players = singleGameFactory.addPlayer(playerName);
         return new PlayerListMessage(players);
     }
 
