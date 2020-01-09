@@ -64,7 +64,12 @@ $(document).ready(function () {
             $('#currentPlayer').html(game.currentPlayer + " is playing");
             $('#categoryScored').html(game.categoryName);
             if (game.categoryName != "")
-                $('#scoringPlayer').html(game.currentPlayer);
+                $('#scoringPlayer').html(game.currentPlayer + " scores category " +
+                    game.categoryName + ": " + game.score +
+                    " with a total score: " + game.sheet.content.TS);
+            else
+                $('#scoringPlayer').html("&nbsp;");
+                
             $('#score').html(game.score);
         }
         stopAnimation = true;

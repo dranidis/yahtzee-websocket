@@ -92,7 +92,10 @@ public class Game {
         round++;
         roundPlayers = new ArrayList<Player>(players.values());
         currentPlayerIndex = 0;
-        currentPlayer = roundPlayers.get(currentPlayerIndex);
+        if (roundPlayers.size() > 0)
+            currentPlayer = roundPlayers.get(currentPlayerIndex);
+        else
+            throw new RuntimeException("Game: no players in the list");
     }
 
     public String getCurrentPlayersName() {

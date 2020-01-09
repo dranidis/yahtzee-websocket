@@ -21,12 +21,12 @@ public class SingleGame {
     private Game game;
     int msDelay = 500; // TODO get from UI
 
-    Set<String> players = new HashSet<>();
+    // Set<String> players = new HashSet<>();
 
-    public List<String> addPlayer(String name) {
-        players.add(name);
-        return new ArrayList<>(players);
-    }
+    // public List<String> addPlayer(String name) {
+    //     players.add(name);
+    //     return new ArrayList<>(players);
+    // }
 
     private void rolling(String currentPlayer, int[] keep, int msDelay) {
         messageSender.convertAndSend("/topic/rolling", new KeepMessage(currentPlayer, keep, msDelay));
@@ -40,7 +40,8 @@ public class SingleGame {
 
     public GameResponse start() {
         game = new Game();
-        for (String player : players)
+         
+        for (String player : PlayerCatalog.getInstance().getListofNames())
             game.addPlayer(player);
 
         game.startRound();

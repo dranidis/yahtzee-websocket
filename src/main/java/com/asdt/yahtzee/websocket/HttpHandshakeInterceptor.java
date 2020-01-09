@@ -23,6 +23,8 @@ public class HttpHandshakeInterceptor implements HandshakeInterceptor {
             attributes.put("sessionId", session.getId());
 
             playerCatalog.playerConnected(session.getId());
+            System.out.println("HttpHandshakeInterceptor:beforeHandshake    Connected users: ");
+            PlayerCatalog.getInstance().print();
         }
         return true;
     }
