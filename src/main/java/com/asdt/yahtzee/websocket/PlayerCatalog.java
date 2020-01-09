@@ -32,7 +32,6 @@ public class PlayerCatalog {
 
     // HTTP sessionId, name
     private Map<String, String> connectedPlayers = new HashMap<>();;
-    private Map<String, String> disconnectedPlayers = new HashMap<>();;
 
     public void playerConnected(String id) {
         // String player = connectedPlayers.get(id);

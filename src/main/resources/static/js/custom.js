@@ -4,6 +4,7 @@ $(document).ready(function () {
     $('#startBtn').hide();
 
     var MS_DELAY = 500; // milliseconds delay for dice animation
+    var playerList = [];
     var playerName;
     var disabled;
     var stopAnimation = false;
@@ -35,11 +36,19 @@ $(document).ready(function () {
     // TODO: After connecting get players already in the game
 
     function showPlayers(players) {
-        $('#players').html(players.map(function (p) {
-            return "<div>" + p + "</div>"
-        }))
+        playerList = players;
 
-        // $("#players").append("<div>" + name + "</div>");
+        $('#players').html(players.map(function (p) {
+            return '<div class="player" id="name_' + p + '">'
+            + '<i class="material-icons prefix">account_circle</i><br>'
+            + p 
+            + '<br/>'
+            + '<span  id="lastcat_' + p + '">&nbsp;</span> : '
+            + '<span  id="lastscore_' + p + '">&nbsp;</span>'
+            + '<br/>'
+            + '<span class="score" id="score_' + p + '">0</span>'
+            + '</div>';
+        }))
     }
 
     /*
@@ -50,10 +59,11 @@ $(document).ready(function () {
         $('#startContainer').hide();
         $("#gameControl").show();
 
+        showscores(game);
+
         if (game.currentPlayer == playerName) {
             disableControl(false);
             updateScoreSheet(game);
-            $('#currentPlayer').html("You are playing");
             $('#keepBtn').prop("disabled", game.roll >= 3);
 
             if (game.categoryName != "") {
@@ -61,14 +71,9 @@ $(document).ready(function () {
             }
         } else {
             disableControl(true);
-            $('#currentPlayer').html(game.currentPlayer + " is playing");
+            
             $('#categoryScored').html(game.categoryName);
-            if (game.categoryName != "")
-                $('#scoringPlayer').html(game.currentPlayer + " scores category " +
-                    game.categoryName + ": " + game.score +
-                    " with a total score: " + game.sheet.content.TS);
-            else
-                $('#scoringPlayer').html("&nbsp;");
+            
                 
             $('#score').html(game.score);
         }
@@ -96,6 +101,21 @@ $(document).ready(function () {
         stompClient.send("/app/start", {});
         $('#startContainer').hide();
     });
+
+    function showscores(game) {
+        playerList.forEach(p => {
+            $("#name_" + p).removeClass("current");
+        });
+
+        $("#name_" + game.currentPlayer).addClass("current");
+
+        $("#score_" + game.currentPlayer).html(game.sheet.content.TS);
+
+        if (game.categoryName != "") {
+            $("#lastcat_" + game.currentPlayer).html(game.categoryName);
+            $("#lastscore_" + game.currentPlayer).html(game.score);
+        }
+    };
 
 
     function succesFun(result) {

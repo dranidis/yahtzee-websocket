@@ -1,9 +1,5 @@
 package com.asdt.yahtzee.websocket;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import com.asdt.yahtzee.game.Game;
@@ -19,7 +15,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class SingleGame {
     private Game game;
-    int msDelay = 500; // TODO get from UI
+    int msDelay = 500; 
 
     // Set<String> players = new HashSet<>();
 
