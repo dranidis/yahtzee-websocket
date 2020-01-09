@@ -50,7 +50,7 @@ public class SingleGame {
         SheetSubResponse sheet = new SheetSubResponse(game.getCurrentPlayer().getFullScoreSheet());
 
         messageSender.convertAndSend("/topic/game", new GameResponse(game.getRound(), currentPlayer, sheet,
-                game.getDice(), game.getCurrentPlayer().getRoll(), "", 0));
+                new int[]{}, game.getCurrentPlayer().getRoll(), "", 0));
 
         rolling(currentPlayer, new int[] {}, msDelay);
 

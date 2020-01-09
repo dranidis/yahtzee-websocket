@@ -35,7 +35,7 @@ $(document).ready(function () {
     // TODO: After connecting get players already in the game
 
     function showPlayers(players) {
-        $('#players').html(players.map(function(p){
+        $('#players').html(players.map(function (p) {
             return "<div>" + p + "</div>"
         }))
 
@@ -53,7 +53,7 @@ $(document).ready(function () {
         if (game.currentPlayer == playerName) {
             disableControl(false);
             updateScoreSheet(game);
-            $('#currentPlayer').html("You");
+            $('#currentPlayer').html("You are playing");
             $('#keepBtn').prop("disabled", game.roll >= 3);
 
             if (game.categoryName != "") {
@@ -61,8 +61,10 @@ $(document).ready(function () {
             }
         } else {
             disableControl(true);
-            $('#currentPlayer').html(game.currentPlayer);
+            $('#currentPlayer').html(game.currentPlayer + " is playing");
             $('#categoryScored').html(game.categoryName);
+            if (game.categoryName != "")
+                $('#scoringPlayer').html(game.currentPlayer);
             $('#score').html(game.score);
         }
         stopAnimation = true;
