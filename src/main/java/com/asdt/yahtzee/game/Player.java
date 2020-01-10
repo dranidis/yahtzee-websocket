@@ -6,7 +6,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.asdt.yahtzee.game.score.ScoreFactory;
-import com.asdt.yahtzee.game.score.ScoreStrategy;
 import com.asdt.yahtzee.game.util.SumNullBuilder;
 
 public class Player {
@@ -155,7 +154,7 @@ public class Player {
         return scoreForCategory;
     }
 
-    public int getScoreForCategory(String categoryName) {
+    private int getScoreForCategory(String categoryName) {
         // already scored category
         if (scored.get(categoryName) != null)
             return -1;
@@ -163,13 +162,6 @@ public class Player {
         // bonus categories are not selected for scoring by user
         if (categoryName.equals("UB") || categoryName.equals("YB"))
             return -3;
-
-        ScoreStrategy ss = ScoreFactory.getInstance().getScoreStrategy(categoryName);
-        // unimplemented strategy, invalid category name
-        if (ss == null) {
-            System.err.println("Not implemented strategy: " + categoryName);
-            return -2;
-        }
 
         boolean isJoker = false;
 
@@ -182,7 +174,7 @@ public class Player {
             isJoker = true;
         }
 
-        int s = ss.calculate(new ArrayList<Die>(Arrays.asList(dice)), isJoker);
+        int s = ScoreFactory.getInstance().getScoreStrategy(categoryName).calculate(new ArrayList<Die>(Arrays.asList(dice)), isJoker);
         return s;
     }
 

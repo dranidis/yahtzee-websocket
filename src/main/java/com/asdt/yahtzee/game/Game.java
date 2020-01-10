@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.asdt.yahtzee.game.score.ScoreFactory;
+
 /**
  * Game class:
  *
@@ -50,12 +52,18 @@ public class Game {
      * @param playerName   the name of the player calling
      * @param categoryName the category to score
      * @return the score
+     * @throws UnknownScoringCategory
      */
-    public int scoreACategory(String playerName, String categoryName) {
+    public int scoreACategory(String playerName, String categoryName) throws UnknownScoringCategory {
         Player called = players.get(playerName);
         if (called != currentPlayer) {
             throw new RuntimeException("Not your turn");
         }
+
+        if(!ScoreFactory.getInstance().isValidCategory(categoryName)) {
+            throw new UnknownScoringCategory(categoryName);
+        }
+
         return called.score(categoryName);
     }
 

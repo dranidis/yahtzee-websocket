@@ -3,6 +3,7 @@ package com.asdt.yahtzee.websocket;
 import java.util.concurrent.TimeUnit;
 
 import com.asdt.yahtzee.game.Game;
+import com.asdt.yahtzee.game.UnknownScoringCategory;
 import com.asdt.yahtzee.websocket.messages.GameResponse;
 import com.asdt.yahtzee.websocket.messages.KeepMessage;
 import com.asdt.yahtzee.websocket.messages.SheetSubResponse;
@@ -15,13 +16,13 @@ import org.springframework.stereotype.Component;
 @Component
 public class SingleGame {
     private Game game;
-    int msDelay = 500; 
+    int msDelay = 500;
 
     // Set<String> players = new HashSet<>();
 
     // public List<String> addPlayer(String name) {
-    //     players.add(name);
-    //     return new ArrayList<>(players);
+    // players.add(name);
+    // return new ArrayList<>(players);
     // }
 
     private void rolling(String currentPlayer, int[] keep, int msDelay) {
@@ -36,7 +37,7 @@ public class SingleGame {
 
     public GameResponse start() {
         game = new Game();
-         
+
         for (String player : PlayerCatalog.getInstance().getListofNames())
             game.addPlayer(player);
 
@@ -47,7 +48,7 @@ public class SingleGame {
         SheetSubResponse sheet = new SheetSubResponse(game.getCurrentPlayer().getFullScoreSheet());
 
         messageSender.convertAndSend("/topic/game", new GameResponse(game.getRound(), currentPlayer, sheet,
-                new int[]{}, game.getCurrentPlayer().getRoll(), "", 0));
+                new int[] {}, game.getCurrentPlayer().getRoll(), "", 0));
 
         rolling(currentPlayer, new int[] {}, msDelay);
 
@@ -73,8 +74,10 @@ public class SingleGame {
     @Autowired
     private SimpMessagingTemplate messageSender;
 
-    public GameResponse scoreCategory(String playerName, String categoryName) {
-        int score = game.scoreACategory(playerName, categoryName);
+    public GameResponse scoreCategory(String playerName, String categoryName) throws UnknownScoringCategory {
+        int score = 0;
+        score = game.scoreACategory(playerName, categoryName);
+
         SheetSubResponse sheet = new SheetSubResponse(game.getCurrentPlayer().getFullScoreSheet());
 
         GameResponse msg = new GameResponse(game.getRound(), playerName, sheet, game.getDice(),

@@ -30,6 +30,10 @@ $(document).ready(function () {
             stompClient.subscribe('/topic/rolling', function (msg) {
                 rollAnimation(JSON.parse(msg.body).keep);
             });
+            stompClient.subscribe('/user/queue/errors', function (msg) {
+                console.log("Error: " + msg)
+                alert(msg.body);
+            });
         });
     }
     connect();

@@ -54,4 +54,8 @@ public class ScoreFactory {
         // clone the keys so that original Map is not changed!
         return  new HashSet<>(scoreStrategies.keySet());
     }
+
+	public boolean isValidCategory(String categoryName) {
+        return scoreStrategies.get(categoryName) != null;
+	}
 }
