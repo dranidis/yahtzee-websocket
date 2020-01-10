@@ -57,7 +57,7 @@ public class GameAppController {
         // the name might have changed
         playerName = PlayerCatalog.getInstance().getName(sessionId);
 
-        messageSender.convertAndSend("/user/" + sessionId + "/queue/name", playerName);
+        messageSender.convertAndSend("/topic/name" + headerAccessor.getSessionId(), playerName);
 
 
         // List<String> players = singleGameFactory.addPlayer(playerName);

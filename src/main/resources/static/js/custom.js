@@ -16,6 +16,10 @@ $(document).ready(function () {
         stompClient = Stomp.over(socket);
         stompClient.connect({}, function (frame) {
             console.log('Connected: ' + frame);
+
+            var sessionId = /\/([^\/]+)\/websocket/.exec(socket._transport.url)[1];
+            console.log("connected, session id: " + sessionId);
+
             stompClient.subscribe('/topic/players', function (player) {
                 showPlayers(JSON.parse(player.body).players);
                 console.log("My name :" + playerName)
@@ -35,13 +39,14 @@ $(document).ready(function () {
                 console.log("Error: " + msg)
                 alert(msg.body);
             });
-            stompClient.subscribe('/user/queue/actualname', function (msg) {
+            stompClient.subscribe('/topic/name' + sessionId, function (msg) {
                 console.log("Actual name: " + msg)
                 playerName = msg.body;
                 console.log("Player name :" + playerName);
             });
         });
     }
+
     connect();
     // TODO: After connecting get players already in the game
 
