@@ -14,6 +14,11 @@ public class SequenceScoreStrategy implements ScoreStrategy {
 
     @Override
     public int calculate(List<Die> kept, boolean isJoker) {
+        if (isJoker && length == 4)
+            return 30;
+        if (isJoker && length == 5)
+            return 40;
+
         kept.sort(Comparator.comparing(Die::getNumber));
         int countSeq = 1;
         for (int i = 0; i < kept.size() - 1; i++) {
@@ -24,9 +29,9 @@ public class SequenceScoreStrategy implements ScoreStrategy {
             return 0;
         } else {
             if (length == 4)
-            return 30;
-        if (length == 5)
-            return 40;
+                return 30;
+            if (length == 5)
+                return 40;
         }
         return 0;
     }

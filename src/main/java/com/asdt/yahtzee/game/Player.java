@@ -51,6 +51,12 @@ public class Player {
             this.dice[i] = dice[i];
     }
 
+    public void setDice(int... dice) {
+        this.dice = new Die[dice.length];
+        for (int i = 0; i < dice.length; i++)
+            this.dice[i] = new Die(dice[i]);
+    }
+
     // for testing
     void setScored(Map<String, Integer> scored) {
         this.scored = scored;
