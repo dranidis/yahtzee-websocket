@@ -3,6 +3,7 @@ package com.asdt.yahtzee.websocket;
 import java.util.concurrent.TimeUnit;
 
 import com.asdt.yahtzee.game.Game;
+import com.asdt.yahtzee.game.InvalidScoringCategory;
 import com.asdt.yahtzee.game.UnknownScoringCategory;
 import com.asdt.yahtzee.websocket.messages.GameResponse;
 import com.asdt.yahtzee.websocket.messages.KeepMessage;
@@ -74,7 +75,8 @@ public class SingleGame {
     @Autowired
     private SimpMessagingTemplate messageSender;
 
-    public GameResponse scoreCategory(String playerName, String categoryName) throws UnknownScoringCategory {
+    public GameResponse scoreCategory(String playerName, String categoryName)
+            throws UnknownScoringCategory, InvalidScoringCategory {
         int score = 0;
         score = game.scoreACategory(playerName, categoryName);
 

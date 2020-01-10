@@ -6,7 +6,9 @@ import static org.junit.Assert.assertNull;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -15,6 +17,9 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
 public class PlayerTest {
+
+    @Rule
+    public ExpectedException exceptionRule = ExpectedException.none();
 
     @Test
     public void getScore0() {
@@ -72,7 +77,7 @@ public class PlayerTest {
     }
 
     @Test
-    public void yahtzeeBonus() {
+    public void yahtzeeBonus() throws InvalidScoringCategory {
         Map<String, Integer> mockScored = new HashMap<>();
         mockScored.put("1s", 2);
         mockScored.put("2s", 6);
@@ -95,7 +100,7 @@ public class PlayerTest {
     }
 
     @Test
-    public void thereIsNoYahtzeeBonusIfYahtzeeIs0() {
+    public void thereIsNoYahtzeeBonusIfYahtzeeIs0() throws InvalidScoringCategory {
         Map<String, Integer> mockScored = new HashMap<>();
 
         mockScored.put("5k", 0);
@@ -104,13 +109,48 @@ public class PlayerTest {
         p.setScored(mockScored);
         p.setDice(new Die[] {new Die(2), new Die(2), new Die(2), new Die(2), new Die(2)});
 
-        assertEquals("score fh as joker", 10, p.score("2s"));
+        assertEquals("score 2s", 10, p.score("2s"));
         assertNull("bonus yahtzee", p.scored.get("YB"));
         assertEquals("Total ", 10, p.getScore());
     }
 
     @Test
-    public void yahtzeeBonusOnlyInUpper() {
+    public void yahtzeeJokerHasToBeFilledFirstInTheUpperSectionWhenYahtzeeIs0() throws InvalidScoringCategory {
+        Map<String, Integer> mockScored = new HashMap<>();
+
+        mockScored.put("5k", 0);
+
+        Player p = new Player("p");
+        p.setScored(mockScored);
+
+        int die = 2;
+        p.setDice(new Die[] {new Die(die), new Die(die), new Die(die), new Die(die), new Die(die)});
+
+        String categoryName = "fh";
+
+        exceptionRule.expect(InvalidScoringCategory.class);
+        exceptionRule.expectMessage(categoryName + " cannot be scored as Joker before you score the matching upper section first: " + die + "s");
+        p.score(categoryName);
+    }
+
+    @Test
+    public void yahtzeeJokerWhenYahtzeeIs0() throws InvalidScoringCategory {
+        Map<String, Integer> mockScored = new HashMap<>();
+
+        mockScored.put("2s", 6);
+        mockScored.put("5k", 0);
+
+        Player p = new Player("p");
+        p.setScored(mockScored);
+        p.setDice(new Die[] {new Die(2), new Die(2), new Die(2), new Die(2), new Die(2)});
+
+        assertEquals("score fh", 25, p.score("fh"));
+        assertNull("bonus yahtzee", p.scored.get("YB"));
+        assertEquals("Total ", 31, p.getScore());
+    }
+
+    @Test
+    public void yahtzeeBonusOnlyInUpper() throws InvalidScoringCategory {
         Map<String, Integer> mockScored = new HashMap<>();
         mockScored.put("1s", 2);
 
@@ -127,7 +167,9 @@ public class PlayerTest {
         p.setScored(mockScored);
         p.setDice(new Die[] {new Die(2), new Die(2), new Die(2), new Die(2), new Die(2)});
 
-        assertEquals("score fh as joker not possible", -5, p.score("fh"));
+        exceptionRule.expect(InvalidScoringCategory.class);
+        exceptionRule.expectMessage("fh" + " cannot be scored as Joker before you score the matching upper section first: " + 2 + "s");
+        p.score("fh");
 
         assertEquals("score 2s as joker is possible", 10, p.score("2s"));
         assertEquals("bonus yahtzee", 100, p.scored.get("YB").intValue());
@@ -135,7 +177,7 @@ public class PlayerTest {
     }
 
     @Test
-    public void secondYahtzeeBonus() {
+    public void secondYahtzeeBonus() throws InvalidScoringCategory {
         Map<String, Integer> mockScored = new HashMap<>();
         mockScored.put("1s", 2);
 

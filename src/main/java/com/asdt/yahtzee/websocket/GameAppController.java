@@ -3,6 +3,7 @@ package com.asdt.yahtzee.websocket;
 import java.util.List;
 import java.util.Map;
 
+import com.asdt.yahtzee.game.InvalidScoringCategory;
 import com.asdt.yahtzee.game.UnknownScoringCategory;
 import com.asdt.yahtzee.websocket.messages.GameResponse;
 import com.asdt.yahtzee.websocket.messages.KeepMessage;
@@ -73,7 +74,7 @@ public class GameAppController {
 
     @MessageMapping("/score")
     @SendTo("/topic/game")
-    public GameResponse roll(ScoreMessage scoreMsg) throws UnknownScoringCategory {
+    public GameResponse roll(ScoreMessage scoreMsg) throws UnknownScoringCategory, InvalidScoringCategory {
         System.out.println("scoreMsg: " + scoreMsg);
         GameResponse gameMsg = singleGameFactory.scoreCategory(scoreMsg.getName(), scoreMsg.getCategory());
         return gameMsg;

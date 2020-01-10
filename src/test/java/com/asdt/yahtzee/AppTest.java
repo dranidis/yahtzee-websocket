@@ -5,6 +5,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import com.asdt.yahtzee.game.Game;
+import com.asdt.yahtzee.game.InvalidScoringCategory;
 import com.asdt.yahtzee.game.UnknownScoringCategory;
 
 import org.junit.Before;
@@ -88,7 +89,7 @@ public class AppTest {
     }
 
     @Test
-    public void scoredCategory() throws UnknownScoringCategory {
+    public void scoredCategory() throws UnknownScoringCategory, InvalidScoringCategory {
         game.getNextPlayer();
 
         game.rollKeeping("p1");
@@ -129,7 +130,7 @@ public class AppTest {
     }
 
     @Test
-    public void alreadyScoredCategory() throws UnknownScoringCategory {
+    public void alreadyScoredCategory() throws UnknownScoringCategory, InvalidScoringCategory {
         game.getNextPlayer();
 
         game.rollKeeping("p1");
@@ -155,7 +156,7 @@ public class AppTest {
     }
 
     @Test
-    public void unknownCategoryThrowsException() throws UnknownScoringCategory {
+    public void unknownCategoryThrowsException() throws UnknownScoringCategory, InvalidScoringCategory {
         game.getNextPlayer();
 
         game.rollKeeping("p1");

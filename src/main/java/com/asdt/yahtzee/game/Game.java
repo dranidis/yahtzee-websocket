@@ -53,8 +53,10 @@ public class Game {
      * @param categoryName the category to score
      * @return the score
      * @throws UnknownScoringCategory
+     * @throws InvalidScoringCategory
      */
-    public int scoreACategory(String playerName, String categoryName) throws UnknownScoringCategory {
+    public int scoreACategory(String playerName, String categoryName)
+            throws UnknownScoringCategory, InvalidScoringCategory {
         Player called = players.get(playerName);
         if (called != currentPlayer) {
             throw new RuntimeException("Not your turn");

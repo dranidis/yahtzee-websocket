@@ -133,13 +133,13 @@ public class Player {
         return s.toString();
     }
 
-    public int score(String categoryName) {
+    public int score(String categoryName) throws InvalidScoringCategory {
         int scoreForCategory = getScoreForCategory(categoryName);
         if (scoreForCategory < 0) {
             return scoreForCategory;
         }
         // update sheet
-        if (isYahtzee()) {
+        if (isBonusYahtzee()) {
             SumNullBuilder sb = new SumNullBuilder();
             sb.add(scored.get("YB")).add(100);
             scored.put("YB", sb.getSum());
@@ -154,7 +154,7 @@ public class Player {
         return scoreForCategory;
     }
 
-    private int getScoreForCategory(String categoryName) {
+    private int getScoreForCategory(String categoryName) throws InvalidScoringCategory {
         // already scored category
         if (scored.get(categoryName) != null)
             return -1;
@@ -165,11 +165,12 @@ public class Player {
 
         boolean isJoker = false;
 
-        if (isYahtzee()) {
+        if (isJokerYahtzee()) {
             int num = dice[0].getNumber();
             String catUpperSection = "" + num + "s";
             if (!categoryName.equals(catUpperSection) && scored.get(catUpperSection) == null) {
-                return -5;
+                // return -5;
+                throw new InvalidScoringCategory(categoryName, num);
             }
             isJoker = true;
         }
@@ -178,7 +179,13 @@ public class Player {
         return s;
     }
 
-    private boolean isYahtzee() {
+    private boolean isJokerYahtzee() {
+        return scored.get("5k") != null && dice[0].getNumber() == dice[1].getNumber()
+                && dice[1].getNumber() == dice[2].getNumber() && dice[2].getNumber() == dice[3].getNumber()
+                && dice[3].getNumber() == dice[4].getNumber();
+    }
+
+    private boolean isBonusYahtzee() {
         return scored.get("5k") != null && scored.get("5k") == 50 && dice[0].getNumber() == dice[1].getNumber()
                 && dice[1].getNumber() == dice[2].getNumber() && dice[2].getNumber() == dice[3].getNumber()
                 && dice[3].getNumber() == dice[4].getNumber();
