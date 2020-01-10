@@ -83,9 +83,16 @@ public class Player {
     }
 
     public Map<String, Integer> getFullScoreSheet() {
+        // call this first in order to update the score sheet
+        // UB etc.
+        //
+        int totalScore = getScore();
+
+        // then copy the score sheet
+        //
         Map<String, Integer> fullScoreSheet = new HashMap<>(scored);
         fullScoreSheet.put("US", getUSScore());
-        fullScoreSheet.put("TS", getScore());
+        fullScoreSheet.put("TS", totalScore);
         if (fullScoreSheet.get("UB") == null) {
             fullScoreSheet.put("UB", 0);
         }
