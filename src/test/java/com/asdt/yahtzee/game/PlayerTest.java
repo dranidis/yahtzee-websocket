@@ -279,4 +279,32 @@ public class PlayerTest {
         assertEquals("6s", totalScore, p.getScore());
 
     }
+
+    @Test
+    public void lastUpperSectionForBonus() throws InvalidScoringCategory {
+        Player p = new Player("p");
+        int totalScore = 0;
+        String cat = "";
+
+        for(int i = 1; i <= 5; i++ ) {
+            p.setDice(i, i, i, 6, 6);
+            cat = "" + i + "s";
+            p.score(cat);
+            totalScore += 3 * i;
+            assertEquals(cat, totalScore, p.getScore());        
+            System.out.println(totalScore);    
+            assertEquals(0, p.getFullScoreSheet().get("UB").intValue());
+        }
+        p.setDice(1, 1, 6, 6, 6);
+        cat = "" + 6 + "s";
+        p.score(cat);
+        totalScore += 3 * 6;
+        System.out.println(totalScore);    
+        totalScore += 35;
+        assertEquals(cat, totalScore, p.getScore());        
+        System.out.println(totalScore);
+        assertEquals(35, p.getFullScoreSheet().get("UB").intValue());
+    
+    }
+
 }
