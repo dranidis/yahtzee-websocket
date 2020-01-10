@@ -93,7 +93,7 @@ public class Player {
             fullScoreSheet.put("YB", 0);
         }
         return fullScoreSheet;
-    } 
+    }
 
     private String getScoreSheet() {
         int upperScore = getUSScore();
@@ -174,15 +174,21 @@ public class Player {
         if (isJokerYahtzee()) {
             int num = dice[0].getNumber();
             String catUpperSection = "" + num + "s";
-            if (!categoryName.equals(catUpperSection) && scored.get(catUpperSection) == null) {
-                // return -5;
+            if (isJokerCategory(categoryName) && scored.get(catUpperSection) == null) {
+                // if (!categoryName.equals(catUpperSection) && scored.get(catUpperSection) == null) {
+                    // return -5;
                 throw new InvalidScoringCategory(categoryName, num);
             }
             isJoker = true;
         }
 
-        int s = ScoreFactory.getInstance().getScoreStrategy(categoryName).calculate(new ArrayList<Die>(Arrays.asList(dice)), isJoker);
+        int s = ScoreFactory.getInstance().getScoreStrategy(categoryName)
+                .calculate(new ArrayList<Die>(Arrays.asList(dice)), isJoker);
         return s;
+    }
+
+    private boolean isJokerCategory(String categoryName) {
+        return categoryName.equals("fh") || categoryName.equals("s4") || categoryName.equals("s5");
     }
 
     private boolean isJokerYahtzee() {
@@ -227,6 +233,5 @@ public class Player {
     public int getRoll() {
         return roll;
     }
-
 
 }

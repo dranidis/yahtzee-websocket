@@ -3,12 +3,8 @@ package com.asdt.yahtzee.game;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -257,8 +253,8 @@ public class PlayerTest {
             p.setDice(i, i, i, i, i);
             p.score("" + i + "s");
             totalScore += 100 + 5 * i;
-            if(i==4) {
-                totalScore += 35; //Uppersection bonus 
+            if (i == 4) {
+                totalScore += 35; // Uppersection bonus
             }
             assertEquals("" + i + "s", totalScore, p.getScore());
         }
@@ -267,4 +263,20 @@ public class PlayerTest {
 
     }
 
+    @Test
+    public void jokerYajhtzeeAtDifferentUpperSectionShouldBeZero() throws InvalidScoringCategory {
+        Player p = new Player("p");
+        int totalScore = 0;
+
+        p.setDice(6, 6, 6, 6, 6);
+        p.score("5k");
+        totalScore += 50;
+        assertEquals("5k", totalScore, p.getScore());
+
+        p.setDice(6, 6, 6, 6, 6);
+        p.score("5s");
+        totalScore += 100; // + 5 * 0
+        assertEquals("6s", totalScore, p.getScore());
+
+    }
 }
