@@ -187,7 +187,7 @@ public class Player {
     }
 
     private boolean isYahtzee() {
-        return scored.get("5k") != null && dice[0].getNumber() == dice[1].getNumber()
+        return scored.get("5k") != null && scored.get("5k") == 50 && dice[0].getNumber() == dice[1].getNumber()
                 && dice[1].getNumber() == dice[2].getNumber() && dice[2].getNumber() == dice[3].getNumber()
                 && dice[3].getNumber() == dice[4].getNumber();
     }
