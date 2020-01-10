@@ -16,6 +16,7 @@ import org.springframework.messaging.handler.annotation.MessageExceptionHandler;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.messaging.simp.annotation.SendToUser;
 import org.springframework.stereotype.Controller;
 
@@ -30,6 +31,9 @@ public class GameAppController {
 
     @Autowired
     SingleGame singleGameFactory;
+
+    @Autowired
+    private SimpMessagingTemplate messageSender;
 
     /**
      * Method receives a message, handles it and then sends the message to the
@@ -49,6 +53,12 @@ public class GameAppController {
 
         System.out.println("GameAppController:addPlayer Session id: " + sessionId);
         PlayerCatalog.getInstance().updateName(sessionId, playerName);
+
+        // the name might have changed
+        playerName = PlayerCatalog.getInstance().getName(sessionId);
+
+        messageSender.convertAndSend("/user/" + sessionId + "/queue/name", playerName);
+
 
         // List<String> players = singleGameFactory.addPlayer(playerName);
         List<String> players = PlayerCatalog.getInstance().getListofNames();

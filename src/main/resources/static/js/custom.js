@@ -18,6 +18,7 @@ $(document).ready(function () {
             console.log('Connected: ' + frame);
             stompClient.subscribe('/topic/players', function (player) {
                 showPlayers(JSON.parse(player.body).players);
+                console.log("My name :" + playerName)
             });
             stompClient.subscribe('/topic/game', function (game) {
                 if (!end)
@@ -33,6 +34,11 @@ $(document).ready(function () {
             stompClient.subscribe('/user/queue/errors', function (msg) {
                 console.log("Error: " + msg)
                 alert(msg.body);
+            });
+            stompClient.subscribe('/user/queue/actualname', function (msg) {
+                console.log("Actual name: " + msg)
+                playerName = msg.body;
+                console.log("Player name :" + playerName);
             });
         });
     }
@@ -90,15 +96,20 @@ $(document).ready(function () {
 
     $("#addPlayerBtn").click(function () {
         var name = $("#playerName").val();
-        playerName = name;
 
-        if (name != "") {
-            stompClient.send("/app/player", {}, JSON.stringify({ 'name': name }));
-            $("#addPlayerBtn").prop("disabled", true);
-            $('#nameenter').hide();
-            $("#playerList").show();
-            $('#startBtn').show();
-            entered = true;
+        if(name.match(/^[0-9a-zA-Z]{1,16}$/)){
+            playerName = name;
+
+            if (name != "") {
+                stompClient.send("/app/player", {}, JSON.stringify({ 'name': name }));
+                $("#addPlayerBtn").prop("disabled", true);
+                $('#nameenter').hide();
+                $("#playerList").show();
+                $('#startBtn').show();
+                entered = true;
+            }        }
+        else{
+            alert("Invalid name");
         }
     });
 

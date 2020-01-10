@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import com.asdt.yahtzee.websocket.messages.PlayerListMessage;
 
@@ -44,7 +45,12 @@ public class PlayerCatalog {
     }
 
 	public void updateName(String sessionId, String playerName) {
-        connectedPlayers.put(sessionId, playerName);
+        AtomicInteger atomicInteger = new AtomicInteger();
+        String uniquePlayerName = playerName;
+        while (connectedPlayers.values().contains(uniquePlayerName)) {
+            uniquePlayerName = playerName + "_" + atomicInteger.incrementAndGet();
+        }
+        connectedPlayers.put(sessionId, uniquePlayerName);
 	}
 
 	public void disconnected(String httpSessionId) {
@@ -58,6 +64,10 @@ public class PlayerCatalog {
 
 	public void print() {
         System.out.println(connectedPlayers.entrySet().toString());
+	}
+
+	public String getName(String sessionId) {
+		return connectedPlayers.get(sessionId);
 	}
 
 }
