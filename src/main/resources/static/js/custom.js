@@ -43,14 +43,15 @@ $(document).ready(function () {
         playerList = players;
 
         $('#players').html(players.map(function (p) {
-            return '<div class="player" id="name_' + p + '">'
+            pid = p.split(' ').join('_');
+            return '<div class="player" id="name_' + pid + '">'
             + '<i class="material-icons prefix">account_circle</i><br>'
             + p 
             + '<br/>'
-            + '<span  id="lastcat_' + p + '">&nbsp;</span> : '
-            + '<span  id="lastscore_' + p + '">&nbsp;</span>'
+            + '<span  id="lastcat_' + pid + '">&nbsp;</span> : '
+            + '<span  id="lastscore_' + pid + '">&nbsp;</span>'
             + '<br/>'
-            + '<span class="score" id="score_' + p + '">0</span>'
+            + '<span class="score" id="score_' + pid + '">0</span>'
             + '</div>';
         }))
     }
@@ -108,16 +109,18 @@ $(document).ready(function () {
 
     function showscores(game) {
         playerList.forEach(p => {
+            p = p.split(' ').join('_');
             $("#name_" + p).removeClass("current");
         });
+        var cPlayer = game.currentPlayer.split(' ').join('_');
 
-        $("#name_" + game.currentPlayer).addClass("current");
+        $("#name_" + cPlayer).addClass("current");
 
-        $("#score_" + game.currentPlayer).html(game.sheet.content.TS);
+        $("#score_" + cPlayer).html(game.sheet.content.TS);
 
         if (game.categoryName != "") {
-            $("#lastcat_" + game.currentPlayer).html(game.categoryName);
-            $("#lastscore_" + game.currentPlayer).html(game.score);
+            $("#lastcat_" + cPlayer).html(game.categoryName);
+            $("#lastscore_" + cPlayer).html(game.score);
         }
     };
 
